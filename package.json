@@ -1,0 +1,46 @@
+{
+  "name": "blockrights",
+  "version": "1.0.0",
+  "description": "Digital Copyright Verifier - Blockchain-based copyright protection",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
+    "start:frontend": "cd frontend && npm start",
+    "start:backend": "cd backend && npm start",
+    "stop": "powershell -ExecutionPolicy Bypass -File scripts/stop.ps1",
+    "stop:unix": "bash scripts/stop.sh",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "setup": "powershell -ExecutionPolicy Bypass -File scripts/setup.ps1",
+    "setup:unix": "bash scripts/setup.sh",
+    "db:init": "mysql -u root -p blockrights_db < backend/server/sql/init.sql",
+    "db:reset": "mysql -u root -p -e \"DROP DATABASE IF EXISTS blockrights_db; CREATE DATABASE blockrights_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\" && npm run db:init"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "concurrently": "^8.2.2",
+    "crypto-js": "^4.2.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1",
+    "next": "14.0.0",
+    "qrcode": "^1.5.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "sharp": "^0.32.6"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^4.2.1",
+    "@types/node": "^20.8.0",
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "eslint": "^8.52.0",
+    "eslint-config-next": "14.0.0",
+    "typescript": "^5.2.0"
+  }
+}
