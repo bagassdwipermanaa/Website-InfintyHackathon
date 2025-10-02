@@ -233,11 +233,11 @@ export default function TentangPage() {
                   Bagas Dwi Permana
                 </h3>
                 <p className="text-blue-600 font-semibold mb-3">
-                  Web Developer / FullStack
+                  Full-Stack Developer
                 </p>
                 <p className="text-gray-600 text-sm">
-                  Spesialis pengembangan web full-stack dengan keahlian dalam
-                  teknologi modern dan arsitektur aplikasi
+                  Spesialis pengembangan aplikasi web end-to-end dengan
+                  teknologi modern dan arsitektur yang skalabel
                 </p>
               </div>
 
@@ -249,11 +249,11 @@ export default function TentangPage() {
                   Ihsan Fauzi
                 </h3>
                 <p className="text-blue-600 font-semibold mb-3">
-                  UI/UX / Frontend Dev
+                  Frontend Developer (UI/UX)
                 </p>
                 <p className="text-gray-600 text-sm">
-                  Ahli desain UI/UX dan pengembangan frontend dengan fokus pada
-                  pengalaman pengguna yang optimal
+                  Berfokus pada UI/UX, membangun antarmuka frontend yang cepat,
+                  responsif, dan ramah pengguna
                 </p>
               </div>
 
@@ -265,11 +265,11 @@ export default function TentangPage() {
                   Sutan Yazid Trenggono Rahman
                 </h3>
                 <p className="text-blue-600 font-semibold mb-3">
-                  Full Stack Developer
+                  Full-Stack Developer
                 </p>
                 <p className="text-gray-600 text-sm">
-                  Developer full-stack dengan keahlian dalam pengembangan
-                  aplikasi end-to-end dan integrasi sistem
+                  Developer full-stack yang membangun layanan backend,
+                  antarmuka, dan integrasi sistem end-to-end
                 </p>
               </div>
 
@@ -284,8 +284,8 @@ export default function TentangPage() {
                   UI/UX Designer
                 </p>
                 <p className="text-gray-600 text-sm">
-                  Desainer UI/UX kreatif dengan kemampuan dalam menciptakan
-                  antarmuka yang menarik dan fungsional
+                  Merancang pengalaman dan antarmuka yang intuitif, konsisten,
+                  serta estetis
                 </p>
               </div>
             </div>
