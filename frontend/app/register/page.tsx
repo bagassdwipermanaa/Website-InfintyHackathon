@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 export default function Register() {
   const [formData, setFormData] = useState({
     name: "",
+    username: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -105,6 +106,25 @@ export default function Register() {
                   required
                   className="input-field"
                   placeholder="Masukkan nama lengkap Anda"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="username"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Username
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleInputChange}
+                  required
+                  className="input-field"
+                  placeholder="Pilih username unik"
                 />
               </div>
 

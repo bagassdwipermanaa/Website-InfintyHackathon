@@ -13,7 +13,7 @@ declare global {
 
 export default function Login() {
   const [formData, setFormData] = useState({
-    email: "",
+    emailOrUsername: "",
     password: "",
     rememberMe: false,
   });
@@ -130,20 +130,20 @@ export default function Login() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label
-                  htmlFor="email"
+                  htmlFor="emailOrUsername"
                   className="block text-sm font-medium text-gray-700 mb-2"
                 >
-                  Email
+                  Email atau Username
                 </label>
                 <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
+                  type="text"
+                  id="emailOrUsername"
+                  name="emailOrUsername"
+                  value={formData.emailOrUsername}
                   onChange={handleInputChange}
                   required
                   className="input-field"
-                  placeholder="contoh@email.com"
+                  placeholder="contoh@email.com atau username"
                 />
               </div>
 
