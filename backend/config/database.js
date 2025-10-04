@@ -15,6 +15,7 @@ const sequelize = new Sequelize(
       min: 0,
       acquire: 30000,
       idle: 10000,
+      acquireTimeout: 60000,
     },
     define: {
       timestamps: true,
@@ -23,8 +24,6 @@ const sequelize = new Sequelize(
     },
     dialectOptions: {
       connectTimeout: 60000,
-      acquireTimeout: 60000,
-      timeout: 60000,
     },
   }
 );
