@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/auth/profile-status`, {
+    const response = await fetch(`http://localhost:5000/api/auth/profile-status`, {
       method: 'GET',
       headers: {
         'Authorization': authHeader,

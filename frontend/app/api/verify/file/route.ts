@@ -4,7 +4,7 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     
-    const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/verification/file`, {
+    const response = await fetch(`http://localhost:5000/api/verification/file`, {
       method: 'POST',
       body: formData,
     });

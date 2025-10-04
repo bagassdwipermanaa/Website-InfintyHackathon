@@ -7,7 +7,7 @@ export async function GET(
   try {
     const { hash } = params
 
-    const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/verification/hash/${hash}`, {
+    const response = await fetch(`http://localhost:5000/api/verification/hash/${hash}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
