@@ -17,7 +17,7 @@ const userRoutes = require("./routes/users");
 const disputeRoutes = require("./routes/disputes");
 
 const app = express();
-const PORT = process.env.PORT || 2134;
+const PORT = process.env.PORT || 5000;
 
 // Security middleware
 app.use(helmet());

@@ -7,36 +7,18 @@ export async function GET(
   try {
     const { hash } = params
 
-    if (!hash || hash.length !== 64) {
-      return NextResponse.json(
-        { success: false, message: 'Invalid hash format' },
-        { status: 400 }
-      )
-    }
-
-    // This would normally check against your backend API
-    // For now, return mock data
-    const mockArtwork = {
-      id: '1',
-      title: 'Sample Digital Art',
-      description: 'This is a sample digital artwork',
-      creator: {
-        name: 'Demo Creator',
-        walletAddress: '0x1234567890123456789012345678901234567890'
+    const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:5000'}/api/verification/hash/${hash}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
       },
-      fileHash: hash,
-      createdAt: new Date().toISOString(),
-      status: 'verified',
-      certificateUrl: '/api/certificates/1/download',
-      nftTokenId: '123'
-    }
+    });
 
-    return NextResponse.json({
-      success: true,
-      isValid: true,
-      artwork: mockArtwork
-    })
+    const data = await response.json();
+
+    return NextResponse.json(data, { status: response.status });
   } catch (error) {
+    console.error('Hash verification API error:', error);
     return NextResponse.json(
       { success: false, message: 'Internal server error' },
       { status: 500 }

@@ -2,6 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { User, Artwork, Certificate, Verification } = require('../models');
 const { authenticateToken } = require('../middleware/auth');
+const { checkVerificationEligibility } = require('../middleware/profileChecker');
 const { uploadArtwork, handleUploadError, generateFileHash, extractFileMetadata } = require('../middleware/upload');
 const { Op } = require('sequelize');
 
@@ -10,6 +11,7 @@ const router = express.Router();
 // Upload artwork
 router.post('/upload',
   authenticateToken,
+  checkVerificationEligibility,
   uploadArtwork,
   handleUploadError,
   [

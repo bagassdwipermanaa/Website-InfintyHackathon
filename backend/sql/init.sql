@@ -1,9 +1,8 @@
 -- BlockRights Database Initialization Script
 -- This script creates the database schema and initial data
 
--- Create database if not exists
-CREATE DATABASE IF NOT EXISTS blockrights_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE blockrights_db;
+-- Use existing hackaton database
+USE hackaton;
 
 -- Create users table
 CREATE TABLE IF NOT EXISTS users (

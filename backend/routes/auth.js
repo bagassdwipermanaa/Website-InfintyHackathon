@@ -2,6 +2,7 @@ const express = require("express");
 const { body, validationResult } = require("express-validator");
 const { User } = require("../models");
 const { generateToken } = require("../middleware/auth");
+const { getProfileCompleteness } = require("../middleware/profileChecker");
 const { uploadAvatar, handleUploadError } = require("../middleware/upload");
 
 const router = express.Router();
@@ -223,12 +224,49 @@ router.get(
   require("../middleware/auth").authenticateToken,
   async (req, res) => {
     try {
+      const profileCompleteness = getProfileCompleteness(req.user);
+      
       res.json({
         success: true,
         user: req.user.toJSON(),
+        profileCompleteness
       });
     } catch (error) {
       console.error("Get user error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  }
+);
+
+// Check profile status for verification eligibility
+router.get(
+  "/profile-status",
+  require("../middleware/auth").authenticateToken,
+  async (req, res) => {
+    try {
+      const profileCompleteness = getProfileCompleteness(req.user);
+      const requiredFields = ['name', 'email'];
+      const missingRequired = requiredFields.filter(field => 
+        !req.user[field] || req.user[field].trim() === ''
+      );
+      
+      const canVerify = missingRequired.length === 0 && req.user.isActive;
+      
+      res.json({
+        success: true,
+        canVerify,
+        profileCompleteness,
+        missingRequired,
+        isActive: req.user.isActive,
+        recommendations: profileCompleteness.missingFields.filter(field => 
+          !requiredFields.includes(field)
+        )
+      });
+    } catch (error) {
+      console.error("Get profile status error:", error);
       res.status(500).json({
         success: false,
         message: "Internal server error",

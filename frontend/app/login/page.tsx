@@ -5,6 +5,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
 
+declare global {
+  interface Window {
+    ethereum?: any;
+  }
+}
+
 export default function Login() {
   const [formData, setFormData] = useState({
     email: "",

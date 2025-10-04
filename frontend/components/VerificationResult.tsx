@@ -316,8 +316,10 @@ export default function VerificationResult({ data }: VerificationResultProps) {
             <button
               onClick={() => {
                 // Untuk demo, kita akan buka Etherscan dengan hash sebagai parameter
-                const etherscanUrl = `https://etherscan.io/search?q=${data.artwork.fileHash}`;
-                window.open(etherscanUrl, "_blank");
+                if (data.artwork) {
+                  const etherscanUrl = `https://etherscan.io/search?q=${data.artwork.fileHash}`;
+                  window.open(etherscanUrl, "_blank");
+                }
               }}
               className="flex-1 btn-secondary"
             >
