@@ -1,105 +1,105 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import Header from '@/components/Header'
-import UploadModal from '@/components/UploadModal'
-import ArtworkCard from '@/components/ArtworkCard'
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Header from "@/components/Header";
+import UploadModal from "@/components/UploadModal";
+import ArtworkCard from "@/components/ArtworkCard";
 
 interface User {
-  id: string
-  name: string
-  email: string
-  walletAddress?: string
+  id: string;
+  name: string;
+  email: string;
+  walletAddress?: string;
 }
 
 interface Artwork {
-  id: string
-  title: string
-  description: string
-  fileHash: string
-  fileType: string
-  fileSize: number
-  createdAt: string
-  status: 'pending' | 'verified' | 'disputed'
-  certificateUrl?: string
-  nftTokenId?: string
+  id: string;
+  title: string;
+  description: string;
+  fileHash: string;
+  fileType: string;
+  fileSize: number;
+  createdAt: string;
+  status: "pending" | "verified" | "disputed";
+  certificateUrl?: string;
+  nftTokenId?: string;
 }
 
 export default function Dashboard() {
-  const [user, setUser] = useState<User | null>(null)
-  const [artworks, setArtworks] = useState<Artwork[]>([])
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const router = useRouter()
+  const [user, setUser] = useState<User | null>(null);
+  const [artworks, setArtworks] = useState<Artwork[]>([]);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    const userData = localStorage.getItem('user')
-    
+    const token = localStorage.getItem("token");
+    const userData = localStorage.getItem("user");
+
     if (!token || !userData) {
-      router.push('/login')
-      return
+      router.push("/login");
+      return;
     }
 
     try {
-      const parsedUser = JSON.parse(userData)
-      setUser(parsedUser)
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser);
     } catch (error) {
-      console.error('Error parsing user data:', error)
+      console.error("Error parsing user data:", error);
       // Clear invalid data and redirect to login
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      router.push('/login')
-      return
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      router.push("/login");
+      return;
     }
-    
-    fetchArtworks()
-  }, [router])
+
+    fetchArtworks();
+  }, [router]);
 
   const fetchArtworks = async () => {
     try {
-      const token = localStorage.getItem('token')
-      const response = await fetch('/api/artworks', {
+      const token = localStorage.getItem("token");
+      const response = await fetch("/api/artworks", {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.ok) {
-        const data = await response.json()
-        setArtworks(data.artworks)
+        const data = await response.json();
+        setArtworks(data.artworks);
       }
     } catch (error) {
-      console.error('Error fetching artworks:', error)
+      console.error("Error fetching artworks:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    router.push('/')
-  }
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    router.push("/login");
+  };
 
   const handleUploadSuccess = (newArtwork: Artwork) => {
-    setArtworks(prev => [newArtwork, ...prev])
-    setIsUploadModalOpen(false)
-  }
+    setArtworks((prev) => [newArtwork, ...prev]);
+    setIsUploadModalOpen(false);
+  };
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
@@ -109,7 +109,8 @@ export default function Dashboard() {
                 Selamat datang, {user?.name}!
               </h1>
               <p className="text-gray-600 mt-2">
-                Kelola dan lindungi karya kreatif Anda dengan teknologi blockchain
+                Kelola dan lindungi karya kreatif Anda dengan teknologi
+                blockchain
               </p>
             </div>
             <div className="flex space-x-4">
@@ -119,10 +120,7 @@ export default function Dashboard() {
               >
                 Upload Karya Baru
               </button>
-              <button
-                onClick={handleLogout}
-                className="btn-secondary"
-              >
+              <button onClick={handleLogout} className="btn-secondary">
                 Keluar
               </button>
             </div>
@@ -134,13 +132,25 @@ export default function Dashboard() {
           <div className="card">
             <div className="flex items-center">
               <div className="p-3 bg-blue-100 rounded-lg">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <svg
+                  className="w-6 h-6 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
                 </svg>
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Total Karya</p>
-                <p className="text-2xl font-bold text-gray-900">{artworks.length}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {artworks.length}
+                </p>
               </div>
             </div>
           </div>
@@ -148,14 +158,26 @@ export default function Dashboard() {
           <div className="card">
             <div className="flex items-center">
               <div className="p-3 bg-green-100 rounded-lg">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  className="w-6 h-6 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Terverifikasi</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Terverifikasi
+                </p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {artworks.filter(a => a.status === 'verified').length}
+                  {artworks.filter((a) => a.status === "verified").length}
                 </p>
               </div>
             </div>
@@ -164,14 +186,24 @@ export default function Dashboard() {
           <div className="card">
             <div className="flex items-center">
               <div className="p-3 bg-yellow-100 rounded-lg">
-                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  className="w-6 h-6 text-yellow-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Menunggu</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {artworks.filter(a => a.status === 'pending').length}
+                  {artworks.filter((a) => a.status === "pending").length}
                 </p>
               </div>
             </div>
@@ -180,14 +212,24 @@ export default function Dashboard() {
           <div className="card">
             <div className="flex items-center">
               <div className="p-3 bg-red-100 rounded-lg">
-                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                <svg
+                  className="w-6 h-6 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                  />
                 </svg>
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Dispute</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {artworks.filter(a => a.status === 'disputed').length}
+                  {artworks.filter((a) => a.status === "disputed").length}
                 </p>
               </div>
             </div>
@@ -214,12 +256,27 @@ export default function Dashboard() {
           {artworks.length === 0 ? (
             <div className="text-center py-12">
               <div className="w-24 h-24 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                <svg
+                  className="w-12 h-12 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                  />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Belum ada karya</h3>
-              <p className="text-gray-600 mb-6">Mulai upload karya pertama Anda untuk melindunginya dengan blockchain</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                Belum ada karya
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Mulai upload karya pertama Anda untuk melindunginya dengan
+                blockchain
+              </p>
               <button
                 onClick={() => setIsUploadModalOpen(true)}
                 className="btn-primary"
@@ -249,5 +306,5 @@ export default function Dashboard() {
         />
       )}
     </div>
-  )
+  );
 }

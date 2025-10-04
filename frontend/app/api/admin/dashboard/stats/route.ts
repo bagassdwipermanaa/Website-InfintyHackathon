@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     }
 
     const response = await fetch(
-      `http://localhost:5000/api/auth/profile-status`,
+      `http://localhost:5000/api/admin/dashboard/stats`,
       {
         method: "GET",
         headers: {
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
-    console.error("Profile status API error:", error);
+    console.error("Admin dashboard stats API error:", error);
     return NextResponse.json(
       { success: false, message: "Internal server error" },
       { status: 500 }

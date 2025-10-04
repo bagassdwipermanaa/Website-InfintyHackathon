@@ -153,7 +153,7 @@ router.post("/login", async (req, res) => {
 
     // Generate token
     const token = generateToken(user.id);
-    
+
     // Generate refresh token if rememberMe is true
     let refreshToken = null;
     if (rememberMe) {
@@ -166,7 +166,9 @@ router.post("/login", async (req, res) => {
     // Remove password from response
     const userWithoutPassword = User.sanitizeUser(user);
 
-    console.log(`✅ User logged in successfully: ${user.email} (ID: ${user.id})`);
+    console.log(
+      `✅ User logged in successfully: ${user.email} (ID: ${user.id})`
+    );
 
     res.json({
       success: true,
@@ -221,10 +223,15 @@ router.get("/me", async (req, res) => {
     // Remove password from response
     const userWithoutPassword = User.sanitizeUser(user);
 
+    // Calculate profile completeness
+    const profileCompleteness =
+      User.calculateProfileCompleteness(userWithoutPassword);
+
     res.json({
       success: true,
       data: {
         user: userWithoutPassword,
+        profileCompleteness,
       },
     });
   } catch (error) {
@@ -259,11 +266,13 @@ router.post("/refresh", async (req, res) => {
 
     // Generate new access token
     const newToken = generateToken(tokenData.user_id);
-    
+
     // Remove password from response
     const userWithoutPassword = User.sanitizeUser(tokenData);
 
-    console.log(`✅ Token refreshed for user: ${tokenData.email} (ID: ${tokenData.user_id})`);
+    console.log(
+      `✅ Token refreshed for user: ${tokenData.email} (ID: ${tokenData.user_id})`
+    );
 
     res.json({
       success: true,
@@ -297,6 +306,165 @@ router.post("/logout", async (req, res) => {
     });
   } catch (error) {
     console.error("Logout error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan server",
+    });
+  }
+});
+
+// Route: GET /api/auth/profile-status
+router.get("/profile-status", async (req, res) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "Token diperlukan",
+      });
+    }
+
+    // Simple token verification
+    if (!token.startsWith("token-")) {
+      return res.status(401).json({
+        success: false,
+        message: "Token tidak valid",
+      });
+    }
+
+    // Extract user ID from token
+    const userId = parseInt(token.split("-")[1]);
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User tidak ditemukan",
+      });
+    }
+
+    // Remove password from response
+    const userWithoutPassword = User.sanitizeUser(user);
+
+    // Calculate profile completeness
+    const profileCompleteness =
+      User.calculateProfileCompleteness(userWithoutPassword);
+
+    // Check if user can verify (has required fields)
+    const requiredFields = ["name", "email"];
+    const missingRequired = requiredFields.filter(
+      (field) =>
+        !userWithoutPassword[field] ||
+        userWithoutPassword[field].toString().trim() === ""
+    );
+
+    const canVerify = missingRequired.length === 0 && user.profile_completed;
+
+    // Generate recommendations
+    const recommendations = [];
+    if (missingRequired.includes("name")) {
+      recommendations.push("Lengkapi nama lengkap Anda");
+    }
+    if (missingRequired.includes("email")) {
+      recommendations.push("Lengkapi email Anda");
+    }
+    if (!userWithoutPassword.bio) {
+      recommendations.push("Tambahkan bio untuk memperkenalkan diri");
+    }
+    if (!userWithoutPassword.website) {
+      recommendations.push("Tambahkan website atau portfolio Anda");
+    }
+    if (!userWithoutPassword.walletAddress) {
+      recommendations.push(
+        "Tambahkan wallet address untuk transaksi blockchain"
+      );
+    }
+
+    res.json({
+      success: true,
+      canVerify,
+      missingRequired,
+      recommendations,
+      profileCompleteness,
+    });
+  } catch (error) {
+    console.error("Profile status error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan server",
+    });
+  }
+});
+
+// Route: PUT /api/auth/profile
+router.put("/profile", async (req, res) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "Token diperlukan",
+      });
+    }
+
+    // Simple token verification
+    if (!token.startsWith("token-")) {
+      return res.status(401).json({
+        success: false,
+        message: "Token tidak valid",
+      });
+    }
+
+    // Extract user ID from token
+    const userId = parseInt(token.split("-")[1]);
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User tidak ditemukan",
+      });
+    }
+
+    const { name, email, bio, website, walletAddress, socialLinks } = req.body;
+
+    // Update user profile
+    const updatedUser = await User.updateProfile(userId, {
+      name,
+      email,
+      bio,
+      website,
+      walletAddress,
+      socialLinks,
+    });
+
+    if (!updatedUser) {
+      return res.status(500).json({
+        success: false,
+        message: "Gagal memperbarui profil",
+      });
+    }
+
+    // Remove password from response
+    const userWithoutPassword = User.sanitizeUser(updatedUser);
+
+    console.log(
+      `✅ Profile updated for user: ${updatedUser.email} (ID: ${updatedUser.id})`
+    );
+
+    res.json({
+      success: true,
+      message: "Profil berhasil diperbarui",
+      data: {
+        user: userWithoutPassword,
+      },
+    });
+  } catch (error) {
+    console.error("Update profile error:", error);
     res.status(500).json({
       success: false,
       message: "Terjadi kesalahan server",

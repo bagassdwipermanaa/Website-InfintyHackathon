@@ -2,9 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request: NextRequest) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const authHeader = request.headers.get("authorization");
+    const artworkId = params.id;
+    const body = await request.json();
 
     if (!authHeader) {
       return NextResponse.json(
@@ -14,13 +19,14 @@ export async function GET(request: NextRequest) {
     }
 
     const response = await fetch(
-      `http://localhost:5000/api/auth/profile-status`,
+      `http://localhost:5000/api/admin/artworks/${artworkId}/status`,
       {
-        method: "GET",
+        method: "PUT",
         headers: {
           Authorization: authHeader,
           "Content-Type": "application/json",
         },
+        body: JSON.stringify(body),
       }
     );
 
@@ -28,7 +34,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
-    console.error("Profile status API error:", error);
+    console.error("Admin artwork status API error:", error);
     return NextResponse.json(
       { success: false, message: "Internal server error" },
       { status: 500 }

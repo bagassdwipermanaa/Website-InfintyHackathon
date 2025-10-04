@@ -6,6 +6,12 @@ require("dotenv").config();
 
 const { testConnection } = require("./config/database");
 const authRoutes = require("./routes/auth-database");
+const adminAuthRoutes = require("./routes/admin-auth");
+const adminDashboardRoutes = require("./routes/admin-dashboard");
+const adminUsersRoutes = require("./routes/admin-users");
+const adminActivitiesRoutes = require("./routes/admin-activities");
+const adminSettingsRoutes = require("./routes/admin-settings");
+const adminArtworksRoutes = require("./routes/admin-artworks");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -48,6 +54,12 @@ app.get("/health", (req, res) => {
 
 // API Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminAuthRoutes);
+app.use("/api/admin", adminDashboardRoutes);
+app.use("/api/admin/users", adminUsersRoutes);
+app.use("/api/admin/activities", adminActivitiesRoutes);
+app.use("/api/admin/settings", adminSettingsRoutes);
+app.use("/api/admin/artworks", adminArtworksRoutes);
 
 // 404 handler
 app.use("*", (req, res) => {
