@@ -11,6 +11,8 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [admin, setAdmin] = useState<any>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -18,7 +20,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     const checkAuth = () => {
       const token = localStorage.getItem("adminToken");
       if (!token) {
-        router.push("/login");
+        setIsAuthenticated(false);
+        setIsLoading(false);
+        router.push("/admin/login");
         return;
       }
 
@@ -27,6 +31,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       if (adminData) {
         setAdmin(JSON.parse(adminData));
       }
+      setIsAuthenticated(true);
+      setIsLoading(false);
     };
 
     checkAuth();
@@ -36,7 +42,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     localStorage.removeItem("adminToken");
     localStorage.removeItem("adminRefreshToken");
     localStorage.removeItem("admin");
-    router.push("/login");
+    router.push("/admin/login");
   };
 
   const navigation = [
@@ -47,13 +53,30 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { name: "Settings", href: "/admin/settings", icon: "⚙️" },
   ];
 
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 bg-blue-600 rounded-full animate-pulse mx-auto mb-4"></div>
+          <p className="text-gray-600">Memeriksa autentikasi...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login page if not authenticated
+  if (!isAuthenticated) {
+    return <>{children}</>;
+  }
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Sidebar */}
       <div
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0`}
+        } lg:translate-x-0 lg:block`}
       >
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
           <div className="flex items-center">
@@ -125,7 +148,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       )}
 
       {/* Main content */}
-      <div className="lg:ml-64">
+      <div className="ml-64">
         {/* Top bar */}
         <div className="bg-white shadow-sm border-b border-gray-200">
           <div className="flex items-center justify-between h-16 px-6">

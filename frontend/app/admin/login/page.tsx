@@ -72,39 +72,39 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+        <div className="bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20">
           <div>
-            <div className="mx-auto h-16 w-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-              <span className="text-white text-2xl font-bold">A</span>
+            <div className="mx-auto h-20 w-20 bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl flex items-center justify-center shadow-2xl">
+              <span className="text-white text-3xl font-bold">👑</span>
             </div>
-            <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
-              Admin Login
+            <h2 className="mt-6 text-center text-4xl font-bold text-white">
+              Admin Panel
             </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
-              Masuk ke panel administrasi BlockRights
+            <p className="mt-2 text-center text-sm text-white/80">
+              Akses eksklusif ke panel administrasi BlockRights
             </p>
           </div>
 
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             {message && (
               <div
-                className={`p-4 rounded-lg ${
+                className={`p-4 rounded-xl ${
                   message.type === "success"
-                    ? "bg-green-100 text-green-800 border border-green-200"
-                    : "bg-red-100 text-red-800 border border-red-200"
+                    ? "bg-green-500/20 text-green-200 border border-green-400/30"
+                    : "bg-red-500/20 text-red-200 border border-red-400/30"
                 }`}
               >
                 {message.text}
               </div>
             )}
 
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
                 <label
                   htmlFor="username"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-semibold text-white/90 mb-2"
                 >
                   Username atau Email
                 </label>
@@ -115,7 +115,7 @@ export default function AdminLoginPage() {
                   required
                   value={formData.username}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white transition-all duration-200"
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl shadow-sm placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white transition-all duration-200 backdrop-blur-sm"
                   placeholder="admin"
                 />
               </div>
@@ -123,7 +123,7 @@ export default function AdminLoginPage() {
               <div>
                 <label
                   htmlFor="password"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-semibold text-white/90 mb-2"
                 >
                   Password
                 </label>
@@ -134,7 +134,7 @@ export default function AdminLoginPage() {
                   required
                   value={formData.password}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white transition-all duration-200"
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl shadow-sm placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white transition-all duration-200 backdrop-blur-sm"
                   placeholder="Masukkan password"
                 />
               </div>
@@ -146,11 +146,11 @@ export default function AdminLoginPage() {
                   type="checkbox"
                   checked={formData.rememberMe}
                   onChange={handleInputChange}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-white/30 rounded bg-white/10"
                 />
                 <label
                   htmlFor="rememberMe"
-                  className="ml-2 block text-sm text-gray-900"
+                  className="ml-2 block text-sm text-white/90"
                 >
                   Ingat saya
                 </label>
@@ -161,19 +161,22 @@ export default function AdminLoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transition-all duration-200"
+                className="w-full flex justify-center py-4 px-6 border border-transparent text-sm font-bold rounded-xl text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-2xl hover:shadow-purple-500/25 transition-all duration-200 transform hover:scale-105"
               >
-                {isLoading ? "Memproses..." : "Masuk"}
+                {isLoading ? "Memproses..." : "🔐 Masuk ke Admin Panel"}
               </button>
             </div>
 
-            <div className="text-center">
+            <div className="text-center space-y-3">
               <a
                 href="/"
-                className="text-sm text-blue-600 hover:text-blue-500 transition-colors"
+                className="text-sm text-white/70 hover:text-white transition-colors flex items-center justify-center"
               >
                 ← Kembali ke halaman utama
               </a>
+              <div className="text-xs text-white/50">
+                Akses terbatas untuk administrator
+              </div>
             </div>
           </form>
         </div>

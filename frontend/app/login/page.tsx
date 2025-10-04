@@ -41,8 +41,7 @@ export default function LoginPage() {
     }
 
     try {
-      // Coba login sebagai user dulu
-      let response = await fetch("/api/auth/login", {
+      const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -50,9 +49,8 @@ export default function LoginPage() {
         body: JSON.stringify(formData),
       });
 
-      let data = await response.json();
+      const data = await response.json();
 
-      // Jika user login berhasil
       if (response.ok && data.success) {
         // Store user token
         localStorage.setItem("token", data.data.token);
@@ -67,42 +65,12 @@ export default function LoginPage() {
         setTimeout(() => {
           router.push("/dashboard");
         }, 1000);
-        return;
+      } else {
+        setMessage({
+          type: "error",
+          text: data.message || "Email/username atau password salah",
+        });
       }
-
-      // Jika user login gagal, coba admin login
-      response = await fetch("/api/admin/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      data = await response.json();
-
-      // Jika admin login berhasil
-      if (response.ok && data.success) {
-        // Store admin token
-        localStorage.setItem("adminToken", data.data.token);
-        if (data.data.refreshToken) {
-          localStorage.setItem("adminRefreshToken", data.data.refreshToken);
-        }
-
-        setMessage({ type: "success", text: "Admin login berhasil!" });
-
-        // Redirect to admin dashboard
-        setTimeout(() => {
-          router.push("/admin/dashboard");
-        }, 1000);
-        return;
-      }
-
-      // Jika kedua login gagal
-      setMessage({
-        type: "error",
-        text: data.message || "Email/username atau password salah",
-      });
     } catch (error) {
       console.error("Login error:", error);
       setMessage({ type: "error", text: "Terjadi kesalahan saat login" });
@@ -238,7 +206,7 @@ export default function LoginPage() {
               </button>
             </div>
 
-            <div className="text-center">
+            <div className="text-center space-y-2">
               <span className="text-sm text-gray-600">
                 Belum punya akun?{" "}
                 <Link
@@ -248,6 +216,17 @@ export default function LoginPage() {
                   Daftar di sini
                 </Link>
               </span>
+              <div className="text-center">
+                <span className="text-sm text-gray-500">
+                  Admin?{" "}
+                  <Link
+                    href="/admin/login"
+                    className="font-medium text-purple-600 hover:text-purple-500"
+                  >
+                    Login Admin
+                  </Link>
+                </span>
+              </div>
             </div>
           </form>
         </div>
