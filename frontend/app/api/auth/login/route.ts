@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     const loginData = {
       email: body.emailOrUsername,
       password: body.password,
-      rememberMe: body.rememberMe,
+      rememberMe: body.rememberMe || false,
     };
 
     const response = await fetch(`http://localhost:5000/api/auth/login`, {

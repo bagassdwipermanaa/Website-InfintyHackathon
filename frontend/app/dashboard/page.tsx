@@ -42,7 +42,18 @@ export default function Dashboard() {
       return
     }
 
-    setUser(JSON.parse(userData))
+    try {
+      const parsedUser = JSON.parse(userData)
+      setUser(parsedUser)
+    } catch (error) {
+      console.error('Error parsing user data:', error)
+      // Clear invalid data and redirect to login
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      router.push('/login')
+      return
+    }
+    
     fetchArtworks()
   }, [router])
 

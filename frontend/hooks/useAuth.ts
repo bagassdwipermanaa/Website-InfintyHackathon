@@ -47,11 +47,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const checkAuthStatus = async () => {
     try {
       const token = localStorage.getItem('token');
+      const userData = localStorage.getItem('user');
+      const refreshToken = localStorage.getItem('refreshToken');
+      
+      // First, try to use cached user data if available
+      if (userData && token) {
+        try {
+          const parsedUser = JSON.parse(userData);
+          setUser(parsedUser);
+          setCanVerify(true); // Assume can verify if we have cached data
+        } catch (error) {
+          console.error('Error parsing cached user data:', error);
+          localStorage.removeItem('user');
+        }
+      }
+      
       if (!token) {
-        setIsLoading(false);
+        // Try to refresh token if we have refresh token
+        if (refreshToken) {
+          await refreshAccessToken();
+        } else {
+          setIsLoading(false);
+        }
         return;
       }
 
+      // Then verify with server
       const response = await fetch('/api/auth/me', {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -60,16 +81,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (response.ok) {
         const data = await response.json();
-        setUser(data.user);
-        setProfileCompleteness(data.profileCompleteness);
-        
-        const requiredFields = ['name', 'email'];
-        const missingRequired = requiredFields.filter(field => 
-          !data.user[field] || data.user[field].trim() === ''
-        );
-        setCanVerify(missingRequired.length === 0 && data.user.isActive);
+        if (data.success && data.data) {
+          setUser(data.data.user);
+          setProfileCompleteness(data.data.profileCompleteness);
+          
+          // Update localStorage with fresh data
+          localStorage.setItem('user', JSON.stringify(data.data.user));
+          
+          const requiredFields = ['name', 'email'];
+          const missingRequired = requiredFields.filter(field => 
+            !data.data.user[field] || data.data.user[field].trim() === ''
+          );
+          setCanVerify(missingRequired.length === 0 && data.data.user.isActive);
+        }
+      } else if (response.status === 401 && refreshToken) {
+        // Token expired, try to refresh
+        await refreshAccessToken();
       } else {
+        // Token invalid, clear everything
         localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('refreshToken');
         setUser(null);
         setProfileCompleteness(null);
         setCanVerify(false);
@@ -77,12 +109,59 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Auth check failed:', error);
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('refreshToken');
       setUser(null);
       setProfileCompleteness(null);
       setCanVerify(false);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const refreshAccessToken = async () => {
+    try {
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (!refreshToken) {
+        return false;
+      }
+
+      const response = await fetch('/api/auth/refresh', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ refreshToken })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data) {
+          localStorage.setItem('token', data.data.token);
+          localStorage.setItem('user', JSON.stringify(data.data.user));
+          setUser(data.data.user);
+          setCanVerify(true);
+          return true;
+        }
+      } else {
+        // Refresh token invalid, clear everything
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('refreshToken');
+        setUser(null);
+        setProfileCompleteness(null);
+        setCanVerify(false);
+      }
+    } catch (error) {
+      console.error('Token refresh failed:', error);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('refreshToken');
+      setUser(null);
+      setProfileCompleteness(null);
+      setCanVerify(false);
+    }
+    return false;
   };
 
   const checkVerificationEligibility = async () => {
@@ -115,25 +194,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, rememberMe: boolean = false) => {
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password, rememberMe })
       });
 
       const data = await response.json();
 
-      if (response.ok) {
-        localStorage.setItem('token', data.token);
-        setUser(data.user);
-        await checkAuthStatus();
+      if (response.ok && data.success && data.data) {
+        localStorage.setItem('token', data.data.token);
+        localStorage.setItem('user', JSON.stringify(data.data.user));
+        
+        // Save refresh token if rememberMe is true
+        if (data.data.refreshToken) {
+          localStorage.setItem('refreshToken', data.data.refreshToken);
+        }
+        
+        setUser(data.data.user);
+        setCanVerify(true);
         return { success: true };
       } else {
-        return { success: false, message: data.message };
+        return { success: false, message: data.message || 'Login failed' };
       }
     } catch (error) {
       console.error('Login failed:', error);
@@ -141,12 +227,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
-    setProfileCompleteness(null);
-    setCanVerify(false);
-    router.push('/');
+  const logout = async () => {
+    try {
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (refreshToken) {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ refreshToken })
+        });
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('refreshToken');
+      setUser(null);
+      setProfileCompleteness(null);
+      setCanVerify(false);
+      router.push('/');
+    }
   };
 
   useEffect(() => {

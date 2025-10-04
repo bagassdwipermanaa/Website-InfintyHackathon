@@ -39,9 +39,19 @@ export default function Login() {
 
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        router.push("/dashboard");
+        if (data.success && data.data) {
+          localStorage.setItem("token", data.data.token);
+          localStorage.setItem("user", JSON.stringify(data.data.user));
+          
+          // Save refresh token if rememberMe is checked
+          if (formData.rememberMe && data.data.refreshToken) {
+            localStorage.setItem("refreshToken", data.data.refreshToken);
+          }
+          
+          router.push("/dashboard");
+        } else {
+          setError(data.message || "Login gagal");
+        }
       } else {
         const data = await response.json();
         setError(data.message || "Email atau password salah");
@@ -80,9 +90,13 @@ export default function Login() {
 
         if (response.ok) {
           const data = await response.json();
-          localStorage.setItem("token", data.token);
-          localStorage.setItem("user", JSON.stringify(data.user));
-          router.push("/dashboard");
+          if (data.success && data.data) {
+            localStorage.setItem("token", data.data.token);
+            localStorage.setItem("user", JSON.stringify(data.data.user));
+            router.push("/dashboard");
+          } else {
+            setError(data.message || "Login wallet gagal");
+          }
         } else {
           setError("Wallet tidak terdaftar. Silakan daftar terlebih dahulu.");
         }

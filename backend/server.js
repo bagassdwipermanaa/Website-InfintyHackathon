@@ -5,7 +5,7 @@ const rateLimit = require("express-rate-limit");
 require("dotenv").config();
 
 const { testConnection } = require("./config/database");
-const authRoutes = require("./routes/auth-persistent");
+const authRoutes = require("./routes/auth-database");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
