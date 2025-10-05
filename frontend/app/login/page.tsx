@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -16,6 +17,7 @@ export default function LoginPage() {
     text: string;
   } | null>(null);
   const router = useRouter();
+  const { login } = useAuth();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -41,34 +43,21 @@ export default function LoginPage() {
     }
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const result = await login(
+        formData.username,
+        formData.password,
+        formData.rememberMe
+      );
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        // Store user token
-        localStorage.setItem("token", data.data.token);
-        if (data.data.refreshToken) {
-          localStorage.setItem("refreshToken", data.data.refreshToken);
-        }
-        localStorage.setItem("user", JSON.stringify(data.data.user));
-
+      if (result.success) {
         setMessage({ type: "success", text: "Login berhasil!" });
-
-        // Redirect to dashboard
         setTimeout(() => {
           router.push("/dashboard");
-        }, 1000);
+        }, 800);
       } else {
         setMessage({
           type: "error",
-          text: data.message || "Email/username atau password salah",
+          text: result.message || "Email/username atau password salah",
         });
       }
     } catch (error) {

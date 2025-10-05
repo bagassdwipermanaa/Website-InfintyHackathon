@@ -31,7 +31,7 @@ export default function AdminActivitiesPage() {
     const checkAuth = () => {
       const token = localStorage.getItem("adminToken");
       if (!token) {
-        router.push("/login");
+        router.push("/admin/login");
         return;
       }
       fetchActivities();
@@ -57,7 +57,7 @@ export default function AdminActivitiesPage() {
         setTotalPages(data.data.pagination.pages);
       } else if (response.status === 401) {
         localStorage.removeItem("adminToken");
-        router.push("/login");
+        router.push("/admin/login");
       } else {
         setError("Gagal memuat data activities");
       }

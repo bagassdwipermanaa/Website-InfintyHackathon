@@ -29,7 +29,7 @@ export default function AdminUsersPage() {
     const checkAuth = () => {
       const token = localStorage.getItem("adminToken");
       if (!token) {
-        router.push("/login");
+        router.push("/admin/login");
         return;
       }
       fetchUsers();
@@ -56,7 +56,7 @@ export default function AdminUsersPage() {
         setTotalPages(data.data.pagination.pages);
       } else if (response.status === 401) {
         localStorage.removeItem("adminToken");
-        router.push("/login");
+        router.push("/admin/login");
       } else {
         setError("Gagal memuat data users");
       }

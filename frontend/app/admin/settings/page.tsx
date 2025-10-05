@@ -28,7 +28,7 @@ export default function AdminSettingsPage() {
     const checkAuth = () => {
       const token = localStorage.getItem("adminToken");
       if (!token) {
-        router.push("/login");
+        router.push("/admin/login");
         return;
       }
       fetchSettings();
@@ -51,7 +51,7 @@ export default function AdminSettingsPage() {
         setSettings(data.data);
       } else if (response.status === 401) {
         localStorage.removeItem("adminToken");
-        router.push("/login");
+        router.push("/admin/login");
       } else {
         setError("Gagal memuat pengaturan sistem");
       }

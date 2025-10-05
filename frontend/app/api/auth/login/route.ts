@@ -4,9 +4,9 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Ubah field username menjadi email untuk backend
+    // Terima email atau username dari client
     const loginData = {
-      email: body.username,
+      email: body.email || body.username,
       password: body.password,
       rememberMe: body.rememberMe || false,
     };

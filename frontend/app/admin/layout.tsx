@@ -18,6 +18,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   useEffect(() => {
     const checkAuth = () => {
+      setIsLoading(true);
       const token = localStorage.getItem("adminToken");
       if (!token) {
         setIsAuthenticated(false);
@@ -36,12 +37,15 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     };
 
     checkAuth();
-  }, [router]);
+  }, [router, pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
     localStorage.removeItem("adminRefreshToken");
     localStorage.removeItem("admin");
+    setAdmin(null);
+    setIsAuthenticated(false);
+    setSidebarOpen(false);
     router.push("/admin/login");
   };
 
@@ -53,7 +57,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { name: "Settings", href: "/admin/settings", icon: "⚙️" },
   ];
 
-  // Show loading state
+  // Selalu render halaman login tanpa shell
+  if (pathname === "/admin/login") {
+    return <>{children}</>;
+  }
+
+  // Show loading state untuk halaman admin selain login
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -65,9 +74,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     );
   }
 
-  // Show login page if not authenticated
+  // Jika belum autentik di halaman admin selain login, jangan render anak
   if (!isAuthenticated) {
-    return <>{children}</>;
+    return null;
   }
 
   return (

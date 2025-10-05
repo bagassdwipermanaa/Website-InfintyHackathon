@@ -46,7 +46,7 @@ export default function AdminDashboardPage() {
     const checkAuth = () => {
       const token = localStorage.getItem("adminToken");
       if (!token) {
-        router.push("/login");
+        router.push("/admin/login");
         return;
       }
       fetchStats();
@@ -69,7 +69,7 @@ export default function AdminDashboardPage() {
         setStats(data.data);
       } else if (response.status === 401) {
         localStorage.removeItem("adminToken");
-        router.push("/login");
+        router.push("/admin/login");
       } else {
         setError("Gagal memuat data dashboard");
       }

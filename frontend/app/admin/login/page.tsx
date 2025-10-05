@@ -53,13 +53,16 @@ export default function AdminLoginPage() {
         if (data.data.refreshToken) {
           localStorage.setItem("adminRefreshToken", data.data.refreshToken);
         }
+        if (data.data.admin) {
+          localStorage.setItem("admin", JSON.stringify(data.data.admin));
+        }
 
         setMessage({ type: "success", text: "Login berhasil!" });
 
         // Redirect to admin dashboard
         setTimeout(() => {
           router.push("/admin/dashboard");
-        }, 1000);
+        }, 500);
       } else {
         setMessage({ type: "error", text: data.message || "Login gagal" });
       }

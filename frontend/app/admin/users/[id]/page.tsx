@@ -39,7 +39,8 @@ export default function UserDetailPage() {
     const checkAuth = () => {
       const token = localStorage.getItem("adminToken");
       if (!token) {
-        router.push("/login");
+        setError("Unauthorized. Silakan login sebagai admin.");
+        setIsLoading(false);
         return;
       }
       fetchUserDetail();
@@ -61,8 +62,7 @@ export default function UserDetailPage() {
         const data = await response.json();
         setUser(data.data);
       } else if (response.status === 401) {
-        localStorage.removeItem("adminToken");
-        router.push("/login");
+        setError("Sesi admin tidak valid atau kedaluwarsa. Silakan login ulang.");
       } else {
         setError("Gagal memuat detail user");
       }

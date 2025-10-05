@@ -28,7 +28,7 @@ export default function Header() {
           </div>
 
           {/* Navigation */}
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex items-center space-x-8">
             <Link
               href="/"
               className="text-gray-700 hover:text-blue-600 transition duration-200"
@@ -36,10 +36,10 @@ export default function Header() {
               Beranda
             </Link>
             <Link
-              href="/fitur"
+              href="/karya"
               className="text-gray-700 hover:text-blue-600 transition duration-200"
             >
-              Fitur
+              Karya Publik
             </Link>
             <Link
               href="/verify"
@@ -53,6 +53,15 @@ export default function Header() {
             >
               Tentang
             </Link>
+
+            {isAuthenticated && (
+              <button
+                onClick={() => router.push("/dashboard")}
+                className="ml-2 px-3 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow hover:from-blue-700 hover:to-purple-700"
+              >
+                Dashboard
+              </button>
+            )}
           </nav>
 
           {/* Auth Buttons */}
@@ -172,7 +181,7 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile menu */}
+          {/* Mobile menu */}
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-200">
             <div className="flex flex-col space-y-4">
@@ -183,10 +192,10 @@ export default function Header() {
                 Beranda
               </Link>
               <Link
-                href="/fitur"
+                href="/karya"
                 className="text-gray-700 hover:text-blue-600 transition duration-200"
               >
-                Fitur
+                Karya Publik
               </Link>
               <Link
                 href="/verify"
