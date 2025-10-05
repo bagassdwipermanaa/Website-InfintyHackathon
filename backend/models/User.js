@@ -102,8 +102,16 @@ class User {
 
   // Update user profile
   static async updateProfile(id, profileData) {
-    const { name, email, bio, website, walletAddress, socialLinks } =
-      profileData;
+    const {
+      name,
+      email,
+      bio,
+      website,
+      walletAddress,
+      socialLinks,
+      phone,
+      address,
+    } = profileData;
 
     const fields = [];
     const values = [];
@@ -138,6 +146,16 @@ class User {
       values.push(JSON.stringify(socialLinks));
     }
 
+    if (phone !== undefined) {
+      fields.push("phone = ?");
+      values.push(phone);
+    }
+
+    if (address !== undefined) {
+      fields.push("address = ?");
+      values.push(address);
+    }
+
     if (fields.length === 0) {
       throw new Error("No fields to update");
     }
@@ -162,6 +180,13 @@ class User {
 
     const sql = "UPDATE users SET password = ? WHERE id = ?";
     const result = await query(sql, [hashedPassword, id]);
+    return result.affectedRows > 0;
+  }
+
+  // Update last login timestamp
+  static async updateLastLogin(id) {
+    const sql = "UPDATE users SET last_login = NOW() WHERE id = ?";
+    const result = await query(sql, [id]);
     return result.affectedRows > 0;
   }
 

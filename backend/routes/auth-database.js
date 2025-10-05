@@ -97,6 +97,11 @@ router.post("/register", async (req, res) => {
     const token = generateToken(newUser.id);
     const refreshToken = generateToken(newUser.id);
 
+    // Update last login
+    try {
+      await User.updateLastLogin(user.id);
+    } catch (_) {}
+
     // Remove password from response
     const userWithoutPassword = User.sanitizeUser(newUser);
 
@@ -161,6 +166,13 @@ router.post("/login", async (req, res) => {
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 30); // 30 days
       await saveRefreshToken(user.id, refreshToken, expiresAt);
+    }
+
+    // Update last login timestamp
+    try {
+      await User.updateLastLogin(user.id);
+    } catch (e) {
+      console.warn("Failed to update last_login for user", user.id, e.message);
     }
 
     // Remove password from response
@@ -430,7 +442,16 @@ router.put("/profile", async (req, res) => {
       });
     }
 
-    const { name, email, bio, website, walletAddress, socialLinks } = req.body;
+    const {
+      name,
+      email,
+      bio,
+      website,
+      walletAddress,
+      socialLinks,
+      phone,
+      address,
+    } = req.body;
 
     // Update user profile
     const updatedUser = await User.updateProfile(userId, {
@@ -440,6 +461,8 @@ router.put("/profile", async (req, res) => {
       website,
       walletAddress,
       socialLinks,
+      phone,
+      address,
     });
 
     if (!updatedUser) {

@@ -28,8 +28,7 @@ router.get("/", async (req, res) => {
     const usersQuery = `
       SELECT 
         id, name, username, email, is_active, last_login, created_at,
-        profile_completed, email_verified, full_name, bio, website, 
-        social_media, phone, address
+        profile_completed, email_verified, bio, website, social_links, phone, address
       FROM users 
       ${whereClause}
       ORDER BY created_at DESC 
@@ -70,62 +69,64 @@ router.get("/:id", async (req, res) => {
   try {
     const userId = req.params.id;
 
-    // Get user details
-    const userQuery = `
-      SELECT 
-        id, name, username, email, is_active, last_login, created_at,
-        profile_completed, email_verified, full_name, bio, website, 
-        social_media, phone, address
-      FROM users 
-      WHERE id = ?
-    `;
+    // Use model helper to avoid column mismatch with different schemas
+    const user = await User.findById(userId);
 
-    const users = await User.query(userQuery, [userId]);
-
-    if (users.length === 0) {
+    if (!user) {
       return res.status(404).json({
         success: false,
         message: "User not found",
       });
     }
 
-    const user = users[0];
+    // Stats and recents guarded to prevent whole endpoint from failing
+    let artworksCount = [{ count: 0 }];
+    let activitiesCount = [{ count: 0 }];
+    let recentActivities = [];
+    let recentArtworks = [];
 
-    // Get user stats
-    const artworksCount = await Artwork.query(
-      "SELECT COUNT(*) as count FROM artworks WHERE user_id = ?",
-      [userId]
-    );
+    try {
+      artworksCount = await Artwork.query(
+        "SELECT COUNT(*) as count FROM artworks WHERE user_id = ?",
+        [userId]
+      );
+    } catch (_) {}
 
-    const activitiesCount = await ActivityLog.query(
-      "SELECT COUNT(*) as count FROM activity_logs WHERE user_id = ?",
-      [userId]
-    );
+    try {
+      activitiesCount = await ActivityLog.query(
+        "SELECT COUNT(*) as count FROM activity_logs WHERE user_id = ?",
+        [userId]
+      );
+    } catch (_) {}
 
-    // Get recent activities
-    const recentActivities = await ActivityLog.query(
-      `SELECT action, description, created_at 
-       FROM activity_logs 
-       WHERE user_id = ? 
-       ORDER BY created_at DESC 
-       LIMIT 5`,
-      [userId]
-    );
+    try {
+      recentActivities = await ActivityLog.query(
+        `SELECT action, description, created_at 
+         FROM activity_logs 
+         WHERE user_id = ? 
+         ORDER BY created_at DESC 
+         LIMIT 5`,
+        [userId]
+      );
+    } catch (_) {}
 
-    // Get recent artworks
-    const recentArtworks = await Artwork.query(
-      `SELECT title, status, created_at 
-       FROM artworks 
-       WHERE user_id = ? 
-       ORDER BY created_at DESC 
-       LIMIT 5`,
-      [userId]
-    );
+    try {
+      recentArtworks = await Artwork.query(
+        `SELECT title, status, created_at 
+         FROM artworks 
+         WHERE user_id = ? 
+         ORDER BY created_at DESC 
+         LIMIT 5`,
+        [userId]
+      );
+    } catch (_) {}
+
+    const sanitized = User.sanitizeUser(user) || user;
 
     const userDetail = {
-      ...user,
-      artworks_count: artworksCount[0].count,
-      activities_count: activitiesCount[0].count,
+      ...sanitized,
+      artworks_count: artworksCount[0]?.count ?? 0,
+      activities_count: activitiesCount[0]?.count ?? 0,
       recent_activities: recentActivities,
       recent_artworks: recentArtworks,
     };

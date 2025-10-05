@@ -17,7 +17,9 @@ interface UserDetail {
   full_name?: string;
   bio?: string;
   website?: string;
-  social_media?: string;
+  social_media?: string; // legacy
+  socialLinks?: Record<string, any>; // parsed from backend sanitizeUser
+  wallet_address?: string;
   phone?: string;
   address?: string;
   artworks_count: number;
@@ -62,7 +64,9 @@ export default function UserDetailPage() {
         const data = await response.json();
         setUser(data.data);
       } else if (response.status === 401) {
-        setError("Sesi admin tidak valid atau kedaluwarsa. Silakan login ulang.");
+        setError(
+          "Sesi admin tidak valid atau kedaluwarsa. Silakan login ulang."
+        );
       } else {
         setError("Gagal memuat detail user");
       }
@@ -71,6 +75,32 @@ export default function UserDetailPage() {
       setError("Terjadi kesalahan saat memuat data");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Helper: normalisasi URL social media dari handle/user input
+  const normalizeSocialUrl = (platform: string, value: string): string => {
+    const v = value.trim();
+    const noAt = v.startsWith("@") ? v.slice(1) : v;
+    if (v.startsWith("http://") || v.startsWith("https://")) return v;
+    switch (platform.toLowerCase()) {
+      case "twitter":
+      case "x":
+        return `https://twitter.com/${noAt}`;
+      case "instagram":
+        return `https://instagram.com/${noAt}`;
+      case "linkedin":
+        return `https://linkedin.com/in/${noAt}`;
+      case "github":
+        return `https://github.com/${noAt}`;
+      case "tiktok":
+        return `https://www.tiktok.com/@${noAt}`;
+      case "facebook":
+        return `https://www.facebook.com/${noAt}`;
+      case "youtube":
+        return `https://youtube.com/${noAt}`;
+      default:
+        return v.startsWith("http") ? v : `https://${v}`;
     }
   };
 
@@ -207,26 +237,20 @@ export default function UserDetailPage() {
                 <div>
                   <span className="text-sm text-gray-500">Full Name:</span>
                   <p className="text-sm font-medium">
-                    {user.full_name || "Not provided"}
+                    {user.full_name || user.name || "-"}
                   </p>
                 </div>
                 <div>
                   <span className="text-sm text-gray-500">Bio:</span>
-                  <p className="text-sm font-medium">
-                    {user.bio || "Not provided"}
-                  </p>
+                  <p className="text-sm font-medium">{user.bio || "-"}</p>
                 </div>
                 <div>
                   <span className="text-sm text-gray-500">Phone:</span>
-                  <p className="text-sm font-medium">
-                    {user.phone || "Not provided"}
-                  </p>
+                  <p className="text-sm font-medium">{user.phone || "-"}</p>
                 </div>
                 <div>
                   <span className="text-sm text-gray-500">Address:</span>
-                  <p className="text-sm font-medium">
-                    {user.address || "Not provided"}
-                  </p>
+                  <p className="text-sm font-medium">{user.address || "-"}</p>
                 </div>
               </div>
             </div>
@@ -237,12 +261,10 @@ export default function UserDetailPage() {
                 Profile Status
               </h3>
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">
-                    Profile Completed:
-                  </span>
+                <div className="text-sm text-gray-700">
+                  <span className="text-gray-500">Profile Completed: </span>
                   <span
-                    className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                    className={`ml-2 px-2 py-0.5 text-xs font-semibold rounded-full align-middle ${
                       user.profile_completed
                         ? "bg-green-100 text-green-800"
                         : "bg-yellow-100 text-yellow-800"
@@ -251,10 +273,10 @@ export default function UserDetailPage() {
                     {user.profile_completed ? "Complete" : "Incomplete"}
                   </span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Email Verified:</span>
+                <div className="text-sm text-gray-700">
+                  <span className="text-gray-500">Email Verified: </span>
                   <span
-                    className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                    className={`ml-2 px-2 py-0.5 text-xs font-semibold rounded-full align-middle ${
                       user.email_verified
                         ? "bg-blue-100 text-blue-800"
                         : "bg-gray-100 text-gray-800"
@@ -263,17 +285,17 @@ export default function UserDetailPage() {
                     {user.email_verified ? "Verified" : "Unverified"}
                   </span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Last Login:</span>
-                  <span className="text-sm font-medium">
+                <div className="text-sm text-gray-700">
+                  <span className="text-gray-500">Last Login: </span>
+                  <span className="ml-2 text-sm font-medium">
                     {user.last_login
                       ? new Date(user.last_login).toLocaleString("id-ID")
                       : "Never"}
                   </span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Joined:</span>
-                  <span className="text-sm font-medium">
+                <div className="text-sm text-gray-700">
+                  <span className="text-gray-500">Joined: </span>
+                  <span className="ml-2 text-sm font-medium">
                     {new Date(user.created_at).toLocaleDateString("id-ID")}
                   </span>
                 </div>
@@ -289,24 +311,75 @@ export default function UserDetailPage() {
                 <div>
                   <span className="text-sm text-gray-500">Website:</span>
                   <p className="text-sm font-medium">
-                    {user.website ? (
-                      <a
-                        href={user.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
-                      >
-                        {user.website}
-                      </a>
-                    ) : (
-                      "Not provided"
-                    )}
+                    {(() => {
+                      const website =
+                        (user as any).website || user.socialLinks?.website;
+                      return website ? (
+                        <a
+                          href={website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline break-all"
+                        >
+                          {website}
+                        </a>
+                      ) : (
+                        "-"
+                      );
+                    })()}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-500">Wallet Address:</span>
+                  <p className="text-sm font-medium break-all">
+                    {user.wallet_address || "-"}
                   </p>
                 </div>
                 <div>
                   <span className="text-sm text-gray-500">Social Media:</span>
-                  <p className="text-sm font-medium">
-                    {user.social_media || "Not provided"}
+                  <p className="text-sm font-medium break-words">
+                    {(() => {
+                      const links = user.social_media
+                        ? { note: user.social_media }
+                        : user.socialLinks || {};
+                      const entries = Object.entries(links).filter(
+                        ([, v]) => v
+                      );
+                      if (entries.length === 0) return "-";
+                      const icon = (platform: string) => {
+                        const p = platform.toLowerCase();
+                        if (p.includes("twitter") || p === "x") return "🐦";
+                        if (p.includes("instagram")) return "📸";
+                        if (p.includes("linkedin")) return "💼";
+                        if (p.includes("github")) return "🐙";
+                        if (p.includes("tiktok")) return "🎵";
+                        if (p.includes("facebook")) return "📘";
+                        if (p.includes("youtube")) return "▶️";
+                        return "🔗";
+                      };
+                      return (
+                        <span className="flex flex-wrap gap-2">
+                          {entries.map(([platform, val]) => {
+                            const url = normalizeSocialUrl(
+                              platform,
+                              String(val)
+                            );
+                            return (
+                              <a
+                                key={platform}
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-blue-600 hover:underline"
+                              >
+                                <span>{icon(platform)}</span>
+                                <span className="capitalize">{platform}</span>
+                              </a>
+                            );
+                          })}
+                        </span>
+                      );
+                    })()}
                   </p>
                 </div>
               </div>

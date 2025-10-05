@@ -12,6 +12,8 @@ interface ProfileData {
   bio: string;
   website: string;
   walletAddress: string;
+  phone?: string;
+  address?: string;
   socialLinks: {
     twitter: string;
     instagram: string;
@@ -28,6 +30,8 @@ export default function ProfilPage() {
     bio: "",
     website: "",
     walletAddress: "",
+    phone: "",
+    address: "",
     socialLinks: {
       twitter: "",
       instagram: "",
@@ -50,6 +54,8 @@ export default function ProfilPage() {
         bio: user.bio || "",
         website: user.website || "",
         walletAddress: user.walletAddress || "",
+        phone: (user as any).phone || "",
+        address: (user as any).address || "",
         socialLinks: {
           twitter: user.socialLinks?.twitter || "",
           instagram: user.socialLinks?.instagram || "",
@@ -124,6 +130,8 @@ export default function ProfilPage() {
         bio: user.bio || "",
         website: user.website || "",
         walletAddress: user.walletAddress || "",
+        phone: (user as any).phone || "",
+        address: (user as any).address || "",
         socialLinks: {
           twitter: user.socialLinks?.twitter || "",
           instagram: user.socialLinks?.instagram || "",
@@ -304,6 +312,36 @@ export default function ProfilPage() {
                     rows={4}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-900"
                     placeholder="Ceritakan tentang diri Anda..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Phone
+                  </label>
+                  <input
+                    type="text"
+                    value={profileData.phone}
+                    onChange={(e) => handleInputChange("phone", e.target.value)}
+                    disabled={!isEditing}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-900"
+                    placeholder="Nomor telepon"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Address
+                  </label>
+                  <input
+                    type="text"
+                    value={profileData.address}
+                    onChange={(e) =>
+                      handleInputChange("address", e.target.value)
+                    }
+                    disabled={!isEditing}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-900"
+                    placeholder="Alamat"
                   />
                 </div>
               </div>
