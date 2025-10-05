@@ -7,21 +7,14 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const page = searchParams.get('page') || '1'
     const limit = searchParams.get('limit') || '50'
-    const status = searchParams.get('status') || 'all'
 
-    const authHeader = request.headers.get('authorization') || ''
-
-    const url = status === 'verified'
-      ? `http://localhost:5000/api/artworks/public?page=${page}&limit=${limit}`
-      : `http://localhost:5000/api/artworks?page=${page}&limit=${limit}&status=${status}`
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        Authorization: authHeader,
-        'Content-Type': 'application/json'
+    const response = await fetch(
+      `http://localhost:5000/api/artworks/public?page=${page}&limit=${limit}`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
       }
-    })
+    )
 
     const data = await response.json()
     return NextResponse.json(data, { status: response.status })
@@ -32,3 +25,5 @@ export async function GET(request: NextRequest) {
     )
   }
 }
+
+

@@ -60,6 +60,30 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Public endpoint: list verified artworks
+router.get("/public", async (req, res) => {
+  try {
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 50;
+    const offset = (page - 1) * limit;
+
+    const items = await Artwork.findAll(limit, offset, "verified");
+    const total = await Artwork.count("verified");
+    const pages = Math.ceil(total / limit);
+
+    res.json({
+      success: true,
+      data: {
+        artworks: items,
+        pagination: { page, limit, total, pages },
+      },
+    });
+  } catch (error) {
+    console.error("List public verified artworks error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
 // Helper: extract userId from simple token format token-<id>-timestamp
 function getUserIdFromAuthHeader(req) {
   const authHeader = req.headers["authorization"];

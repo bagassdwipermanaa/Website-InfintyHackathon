@@ -26,12 +26,23 @@ export default function KaryaPublikPage() {
   useEffect(() => {
     const fetchVerified = async () => {
       try {
-        const res = await fetch("/api/artworks?status=verified");
+        const res = await fetch("/api/artworks/public");
         if (!res.ok) {
           throw new Error("Gagal memuat karya");
         }
         const data = await res.json();
-        setArtworks(data.artworks || []);
+        const list = data.data?.artworks || data.artworks || [];
+        const normalized = list.map((a: any) => ({
+          id: String(a.id),
+          title: a.title,
+          description: a.description,
+          fileHash: a.file_hash || a.fileHash,
+          fileType: a.file_type || a.fileType,
+          fileSize: a.file_size || a.fileSize,
+          createdAt: a.created_at || a.createdAt,
+          status: (a.status as any) || "verified",
+        }));
+        setArtworks(normalized);
       } catch (e: any) {
         setError(e.message || "Terjadi kesalahan");
       } finally {
