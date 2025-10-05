@@ -1,39 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const page = searchParams.get('page') || '1'
-    const limit = searchParams.get('limit') || '10'
-    const status = searchParams.get('status')
-    const category = searchParams.get('category')
+    const limit = searchParams.get('limit') || '50'
+    const status = searchParams.get('status') || 'all'
 
-    // This would normally fetch from your backend API
-    // For now, return mock data
-    const mockArtworks = [
+    const authHeader = request.headers.get('authorization') || ''
+
+    const response = await fetch(
+      `http://localhost:5000/api/artworks?page=${page}&limit=${limit}&status=${status}`,
       {
-        id: '1',
-        title: 'Sample Digital Art',
-        description: 'This is a sample digital artwork',
-        fileHash: 'a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef1234567890',
-        fileType: 'image/png',
-        fileSize: 1024000,
-        createdAt: new Date().toISOString(),
-        status: 'verified',
-        certificateUrl: '/api/certificates/1/download'
+        method: 'GET',
+        headers: {
+          Authorization: authHeader,
+          'Content-Type': 'application/json'
+        }
       }
-    ]
+    )
 
-    return NextResponse.json({
-      success: true,
-      artworks: mockArtworks,
-      pagination: {
-        total: mockArtworks.length,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        pages: Math.ceil(mockArtworks.length / parseInt(limit))
-      }
-    })
+    const data = await response.json()
+    return NextResponse.json(data, { status: response.status })
   } catch (error) {
     return NextResponse.json(
       { success: false, message: 'Internal server error' },

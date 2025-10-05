@@ -51,26 +51,15 @@ export default function Verify() {
       const response = await fetch(`/api/verify/hash/${hash}`);
       const data = await response.json();
 
-      if (response.ok) {
-        setVerificationData(data);
+      if (response.ok && data && (data.isValid || data.success)) {
+        const normalized = data.artwork
+          ? { isValid: true, artwork: data.artwork }
+          : { isValid: true, artwork: data.data?.artwork };
+        setVerificationData(normalized as any);
       } else {
         if (hash.length >= 10) {
           const dummyData: VerificationData = {
-            isValid: true,
-            artwork: {
-              id: "1",
-              title: "Sample Digital Art",
-              description: "This is a sample digital artwork",
-              creator: {
-                name: "Demo Creator",
-                walletAddress: "0x1234567890abcdef1234567890abcdef12345678",
-              },
-              fileHash: hash,
-              createdAt: new Date().toISOString(),
-              status: "verified",
-              certificateUrl: "/api/certificate/sample.pdf",
-              nftTokenId: "123",
-            },
+            isValid: false,
           };
           setVerificationData(dummyData);
         } else {
@@ -131,6 +120,31 @@ export default function Verify() {
       verifyByHash(hashInput.trim());
     }
   };
+
+  // Saat datang dari tombol Verifikasi di kartu, ambil hash dari query (?hash=...)
+  // Tombol Verifikasi pada kartu sebaiknya sudah mengirim query hash. Jika belum,
+  // kita bisa tambahkan dukungan ID (?id=...) lalu fetch detail untuk mengambil hash.
+  useEffect(() => {
+    const idFromUrl = searchParams.get("id");
+    if (!hashFromUrl && idFromUrl) {
+      // Fetch detail simpel ke backend, lalu set hash
+      (async () => {
+        try {
+          const token = localStorage.getItem("token");
+          const res = await fetch(`/api/artworks?id=${idFromUrl}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const data = await res.json();
+          const item = data.data?.artworks?.find((a: any) => String(a.id) === String(idFromUrl));
+          const fileHash = item?.file_hash || item?.fileHash;
+          if (fileHash) {
+            setHashInput(fileHash);
+            verifyByHash(fileHash);
+          }
+        } catch {}
+      })();
+    }
+  }, [hashFromUrl, searchParams]);
 
   return (
     <div className="min-h-screen">

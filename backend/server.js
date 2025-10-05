@@ -12,6 +12,7 @@ const adminUsersRoutes = require("./routes/admin-users");
 const adminActivitiesRoutes = require("./routes/admin-activities");
 const adminSettingsRoutes = require("./routes/admin-settings");
 const adminArtworksRoutes = require("./routes/admin-artworks");
+const userArtworksRoutes = require("./routes/artworks");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -60,6 +61,7 @@ app.use("/api/admin/users", adminUsersRoutes);
 app.use("/api/admin/activities", adminActivitiesRoutes);
 app.use("/api/admin/settings", adminSettingsRoutes);
 app.use("/api/admin/artworks", adminArtworksRoutes);
+app.use("/api/artworks", userArtworksRoutes);
 
 // 404 handler
 app.use("*", (req, res) => {

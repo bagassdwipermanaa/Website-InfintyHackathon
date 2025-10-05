@@ -30,6 +30,21 @@ class Artwork {
     return await query(sql, [userId, limit, offset]);
   }
 
+  // Mencari artwork berdasarkan hash
+  static async findByHash(fileHash) {
+    const sql = `
+      SELECT a.*, u.name as user_name, u.email as user_email,
+             au.full_name as verified_by_name
+      FROM artworks a
+      LEFT JOIN users u ON a.user_id = u.id
+      LEFT JOIN admin_users au ON a.verified_by = au.id
+      WHERE LOWER(a.file_hash) = LOWER(?)
+      LIMIT 1
+    `;
+    const artworks = await query(sql, [fileHash]);
+    return artworks[0] || null;
+  }
+
   // Get all artworks dengan pagination
   static async findAll(limit = 50, offset = 0, status = null) {
     let sql = `

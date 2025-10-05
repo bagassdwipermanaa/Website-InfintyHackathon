@@ -23,6 +23,7 @@ interface ArtworkCardProps {
 
 export default function ArtworkCard({ artwork, onUpdate }: ArtworkCardProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const recordHash = `${(artwork.fileHash || '').toString()}_${(artwork.id || '').toString()}`
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -30,6 +31,8 @@ export default function ArtworkCard({ artwork, onUpdate }: ArtworkCardProps) {
         return 'bg-green-100 text-green-800'
       case 'pending':
         return 'bg-yellow-100 text-yellow-800'
+      case 'rejected':
+        return 'bg-red-100 text-red-800'
       case 'disputed':
         return 'bg-red-100 text-red-800'
       default:
@@ -43,6 +46,8 @@ export default function ArtworkCard({ artwork, onUpdate }: ArtworkCardProps) {
         return 'Terverifikasi'
       case 'pending':
         return 'Menunggu'
+      case 'rejected':
+        return 'Ditolak'
       case 'disputed':
         return 'Dispute'
       default:
@@ -58,12 +63,13 @@ export default function ArtworkCard({ artwork, onUpdate }: ArtworkCardProps) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
   }
 
-  const getFileIcon = (fileType: string) => {
-    if (fileType.startsWith('image/')) return '🖼️'
-    if (fileType.startsWith('audio/')) return '🎵'
-    if (fileType.startsWith('video/')) return '🎬'
-    if (fileType.includes('pdf')) return '📄'
-    if (fileType.includes('text')) return '📝'
+  const getFileIcon = (fileType?: string) => {
+    const t = fileType || ''
+    if (t.startsWith('image/')) return '🖼️'
+    if (t.startsWith('audio/')) return '🎵'
+    if (t.startsWith('video/')) return '🎬'
+    if (t.includes('pdf')) return '📄'
+    if (t.includes('text')) return '📝'
     return '📁'
   }
 
@@ -160,16 +166,16 @@ export default function ArtworkCard({ artwork, onUpdate }: ArtworkCardProps) {
 
       <div className="space-y-2">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-500">Hash:</span>
+          <span className="text-gray-500">ID Upload:</span>
           <span className="font-mono text-xs text-gray-700 bg-gray-100 px-2 py-1 rounded">
-            {artwork.fileHash.substring(0, 8)}...{artwork.fileHash.substring(artwork.fileHash.length - 8)}
+            {(artwork.id || "").toString()}
           </span>
         </div>
-        
+
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-500">ID:</span>
-          <span className="font-mono text-xs text-gray-700">
-            {artwork.id.substring(0, 8)}...
+          <span className="text-gray-500">Hash Rekaman:</span>
+          <span className="font-mono text-xs text-gray-700 bg-gray-100 px-2 py-1 rounded" title={`Hash Konten: ${artwork.fileHash || ''}`}>
+            {recordHash.substring(0, 8)}...{recordHash.substring(Math.max(0, recordHash.length - 8))}
           </span>
         </div>
       </div>
@@ -177,7 +183,7 @@ export default function ArtworkCard({ artwork, onUpdate }: ArtworkCardProps) {
       <div className="mt-4 pt-4 border-t border-gray-200">
         <div className="flex space-x-2">
           <Link
-            href={`/verify?hash=${artwork.fileHash}`}
+            href={`/verify?hash=${encodeURIComponent(artwork.fileHash || '')}&id=${encodeURIComponent(artwork.id)}`}
             className="flex-1 text-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition duration-200"
           >
             Verifikasi

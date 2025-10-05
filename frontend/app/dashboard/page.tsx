@@ -30,6 +30,7 @@ export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [filter, setFilter] = useState<"all" | "verified" | "pending">("all");
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
@@ -68,7 +69,19 @@ export default function Dashboard() {
 
       if (response.ok) {
         const data = await response.json();
-        setArtworks(data.artworks);
+        const list = data.data?.artworks || data.artworks || [];
+        // Normalisasi field agar cocok dengan ArtworkCard
+        const normalized = list.map((a: any) => ({
+          id: String(a.id),
+          title: a.title,
+          description: a.description,
+          fileHash: a.file_hash || a.fileHash,
+          fileType: a.file_type || a.fileType,
+          fileSize: a.file_size || a.fileSize,
+          createdAt: a.created_at || a.createdAt,
+          status: (a.status as any) || "pending",
+        }));
+        setArtworks(normalized);
       }
     } catch (error) {
       console.error("Error fetching artworks:", error);
@@ -241,19 +254,42 @@ export default function Dashboard() {
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Karya Saya</h2>
             <div className="flex space-x-2">
-              <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+              <button
+                onClick={() => setFilter("all")}
+                className={`px-4 py-2 text-sm font-medium rounded-lg border transition ${
+                  filter === "all"
+                    ? "text-blue-700 bg-blue-50 border-blue-300"
+                    : "text-gray-700 bg-white border-gray-300 hover:bg-gray-50"
+                }`}
+              >
                 Semua
               </button>
-              <button className="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded-lg">
+              <button
+                onClick={() => setFilter("verified")}
+                className={`px-4 py-2 text-sm font-medium rounded-lg border transition ${
+                  filter === "verified"
+                    ? "text-blue-700 bg-blue-50 border-blue-300"
+                    : "text-gray-700 bg-white border-gray-300 hover:bg-gray-50"
+                }`}
+              >
                 Terverifikasi
               </button>
-              <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+              <button
+                onClick={() => setFilter("pending")}
+                className={`px-4 py-2 text-sm font-medium rounded-lg border transition ${
+                  filter === "pending"
+                    ? "text-blue-700 bg-blue-50 border-blue-300"
+                    : "text-gray-700 bg-white border-gray-300 hover:bg-gray-50"
+                }`}
+              >
                 Menunggu
               </button>
             </div>
           </div>
 
-          {artworks.length === 0 ? (
+          {(artworks.filter((a) =>
+            filter === "all" ? true : filter === "verified" ? a.status === "verified" : a.status === "pending"
+          ).length === 0) ? (
             <div className="text-center py-12">
               <div className="w-24 h-24 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <svg
@@ -286,7 +322,15 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {artworks.map((artwork) => (
+              {artworks
+                .filter((a) =>
+                  filter === "all"
+                    ? true
+                    : filter === "verified"
+                    ? a.status === "verified"
+                    : a.status === "pending"
+                )
+                .map((artwork) => (
                 <ArtworkCard
                   key={artwork.id}
                   artwork={artwork}
