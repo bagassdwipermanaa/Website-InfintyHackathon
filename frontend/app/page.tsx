@@ -5,8 +5,10 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
-import HowItWorks from "@/components/HowItWorks";
+import Spotlight from "@/components/Spotlight";
+import AboutUs from "@/components/AboutUs";
 import Footer from "@/components/Footer";
+import ChatBubble from "@/components/ChatBubble";
 
 export default function Home() {
   return (
@@ -14,8 +16,10 @@ export default function Home() {
       <Header />
       <Hero />
       <Features />
-      <HowItWorks />
+      <Spotlight />
+      <AboutUs />
       <Footer />
+      <ChatBubble />
     </main>
   );
 }

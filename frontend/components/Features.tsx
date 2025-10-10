@@ -9,213 +9,222 @@ export default function Features() {
     setIsVisible(true);
   }, []);
 
-  const coreFeatures = [
+  const features = [
     {
-      icon: "📁",
-      title: "Upload & Hashing File",
+      id: "everyone",
+      title: "Hak Cipta Disederhanakan",
+      subtitle: "Untuk Semua Orang",
       description:
-        "Sistem generate hash unik untuk setiap karya yang diupload dengan algoritma SHA-256 yang aman.",
-      color: "from-blue-500 to-cyan-500"
+        "Buat, kelola, dan buktikan kepemilikan karya kreatif Anda—semua dalam satu platform, dengan teknologi blockchain yang aman.",
+      features: [
+        {
+          icon: "🔗",
+          text: "Buka pengalaman digital dan dunia nyata yang unik.",
+        },
+        {
+          icon: "💳",
+          text: "Mulai tanpa perlu crypto atau wallet.",
+        },
+      ],
+      illustration: "left",
+      bgColor: "from-blue-50 to-purple-50",
     },
     {
-      icon: "⛓️",
-      title: "Smart Contract Recording",
+      id: "web3",
+      title: "Ambil Kendali",
+      subtitle: "Untuk Web3 Native",
       description:
-        "Hash, wallet address, dan timestamp disimpan secara permanen di blockchain Ethereum.",
-      color: "from-purple-500 to-pink-500"
+        "Buat, kelola, dan buktikan kepemilikan karya kreatif Anda—semua dalam satu platform, dengan teknologi blockchain yang aman.",
+      features: [
+        {
+          icon: "🔗",
+          text: "Hubungkan beberapa wallet per akun.",
+        },
+        {
+          icon: "📊",
+          text: "Urutkan, beri tag, dan kelola karya digital.",
+        },
+      ],
+      illustration: "right",
+      bgColor: "from-purple-50 to-pink-50",
     },
     {
-      icon: "📊",
-      title: "Dashboard Kreator",
+      id: "creators",
+      title: "Luncurkan Koleksi Anda",
+      subtitle: "Untuk Brand & Kreator",
       description:
-        "Kelola semua karya terdaftar, lihat status kepemilikan, dan riwayat transaksi.",
-      color: "from-green-500 to-emerald-500"
-    },
-    {
-      icon: "📜",
-      title: "Digital Certificate",
-      description:
-        "Sertifikat kepemilikan otomatis dalam format PDF dan NFT yang dapat diunduh.",
-      color: "from-orange-500 to-red-500"
-    },
-    {
-      icon: "✅",
-      title: "Verify Work",
-      description:
-        "Publik dapat verifikasi kepemilikan karya melalui hash atau QR code dengan mudah.",
-      color: "from-indigo-500 to-purple-500"
-    },
-  ];
-
-  const advancedFeatures = [
-    {
-      icon: "⏰",
-      title: "Timestamp Otomatis",
-      description:
-        "Bukti immutable siapa yang upload duluan dan kapan karya tersebut dibuat.",
-      color: "from-yellow-500 to-orange-500"
-    },
-    {
-      icon: "💧",
-      title: "Watermark Digital",
-      description:
-        "Embed metadata dan fingerprint unik ke dalam file sebagai bukti tambahan.",
-      color: "from-cyan-500 to-blue-500"
-    },
-    {
-      icon: "🆔",
-      title: "KYC + Wallet Binding",
-      description:
-        "Sertifikat lebih sah karena terkait dengan identitas asli dan wallet address.",
-      color: "from-pink-500 to-rose-500"
-    },
-    {
-      icon: "🏆",
-      title: "Soulbound NFT",
-      description:
-        "Sertifikat NFT yang non-transferable, selamanya melekat di wallet kreator.",
-      color: "from-violet-500 to-purple-500"
-    },
-    {
-      icon: "📱",
-      title: "QR Code Proof",
-      description:
-        "Scan QR code langsung untuk cek bukti kepemilikan on-chain secara real-time.",
-      color: "from-teal-500 to-green-500"
-    },
-    {
-      icon: "⚖️",
-      title: "Legal Export",
-      description:
-        "Sertifikat PDF dengan tanda tangan digital untuk bukti hukum yang sah.",
-      color: "from-amber-500 to-yellow-500"
-    },
-  ];
-
-  const wowFeatures = [
-    {
-      icon: "🤖",
-      title: "AI-Powered Copyright Scan",
-      description:
-        "AI mengecek karya mirip/persis sama dengan karya terdaftar untuk mencegah plagiarisme.",
-      color: "from-blue-600 to-indigo-600"
-    },
-    {
-      icon: "📱",
-      title: "Mobile App Integration",
-      description:
-        "Kreator dapat upload dan verifikasi langsung dari smartphone dengan mudah.",
-      color: "from-purple-600 to-pink-600"
-    },
-    {
-      icon: "🌐",
-      title: "Cross-Chain Support",
-      description:
-        "Deploy tidak hanya di Ethereum, tapi juga Polygon, Solana, dan blockchain lokal.",
-      color: "from-green-600 to-teal-600"
-    },
-    {
-      icon: "🏛️",
-      title: "Government Partnership",
-      description:
-        "Integrasi dengan DJKI dan lembaga hukum untuk sertifikat dengan kekuatan legal lebih kuat.",
-      color: "from-orange-600 to-red-600"
+        "Buat, kelola, dan buktikan kepemilikan karya kreatif Anda—semua dalam satu platform, dengan teknologi blockchain yang aman.",
+      features: [
+        {
+          icon: "🏪",
+          text: "Siapkan toko Anda dengan mudah.",
+        },
+        {
+          icon: "✨",
+          text: "Mint gratis dengan Gasless Minting.",
+        },
+      ],
+      illustration: "left",
+      bgColor: "from-green-50 to-blue-50",
     },
   ];
 
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 grid-pattern opacity-20"></div>
-      
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0">
+        {/* Floating geometric shapes */}
+        <div className="absolute top-20 left-10 w-4 h-4 bg-purple-400 rounded-full opacity-40 animate-pulse"></div>
+        <div className="absolute top-40 left-20 w-6 h-6 bg-blue-400 rotate-45 opacity-30 animate-bounce"></div>
+        <div className="absolute top-60 left-32 w-3 h-3 bg-green-400 rounded-full opacity-50"></div>
+
+        <div className="absolute top-32 right-20 w-4 h-4 bg-purple-400 rounded-full opacity-40 animate-pulse"></div>
+        <div className="absolute top-52 right-32 w-6 h-6 bg-blue-400 rotate-45 opacity-30 animate-bounce"></div>
+        <div className="absolute top-72 right-16 w-3 h-3 bg-green-400 rounded-full opacity-50"></div>
+      </div>
+
       <div className="relative z-10 max-w-7xl mx-auto">
-        <div className={`text-center mb-20 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-            Fitur Lengkap{" "}
-            <span className="gradient-text">BlockRights</span>
-          </h2>
-          <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-            Platform terlengkap untuk perlindungan hak cipta digital dengan teknologi blockchain terdepan
-          </p>
-        </div>
-
-        {/* Core Features */}
-        <div className="mb-20">
-          <div className={`text-center mb-12 transition-all duration-1000 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <h3 className="text-3xl font-bold text-gray-900 mb-4">
-              🔹 Core Features
-            </h3>
-            <p className="text-lg text-gray-600">Fitur utama yang wajib ada</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {coreFeatures.map((feature, index) => (
+        {features.map((feature, index) => (
+          <div
+            key={feature.id}
+            className={`mb-32 ${feature.bgColor} rounded-3xl p-12 lg:p-16`}
+          >
+            <div
+              className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${
+                feature.illustration === "right" ? "lg:grid-flow-col-dense" : ""
+              }`}
+            >
+              {/* Content */}
               <div
-                key={index}
-                className={`card-hover group transition-all duration-1000 delay-${300 + index * 100} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                className={`${
+                  feature.illustration === "right" ? "lg:col-start-2" : ""
+                } ${
+                  isVisible
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-10"
+                } transition-all duration-1000 delay-${index * 200}`}
               >
-                <div className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                  {feature.icon}
+                <div className="text-sm font-semibold text-purple-600 mb-4 uppercase tracking-wide">
+                  {feature.subtitle}
                 </div>
-                <h4 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors duration-300">
+                <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
                   {feature.title}
-                </h4>
-                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+                </h2>
+                <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                  {feature.description}
+                </p>
 
-        {/* Advanced Features */}
-        <div className="mb-20">
-          <div className={`text-center mb-12 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <h3 className="text-3xl font-bold text-gray-900 mb-4">
-              🔹 Advanced Features
-            </h3>
-            <p className="text-lg text-gray-600">Fitur canggih yang meyakinkan</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {advancedFeatures.map((feature, index) => (
-              <div
-                key={index}
-                className={`card-hover group transition-all duration-1000 delay-${600 + index * 100} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-              >
-                <div className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                  {feature.icon}
+                {/* Feature list */}
+                <div className="space-y-6">
+                  {feature.features.map((item, itemIndex) => (
+                    <div key={itemIndex} className="flex items-start space-x-4">
+                      <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                        <span className="text-white text-sm">{item.icon}</span>
+                      </div>
+                      <p className="text-gray-700 text-lg leading-relaxed">
+                        {item.text}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-                <h4 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-purple-600 transition-colors duration-300">
-                  {feature.title}
-                </h4>
-                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
               </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Wow Factor Features */}
-        <div className={`bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 rounded-3xl p-12 shadow-2xl transition-all duration-1000 delay-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-gray-900 mb-4">
-              🔹 Extra "Wow Factor"
-            </h3>
-            <p className="text-lg text-gray-600">Fitur visioner yang membedakan</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {wowFeatures.map((feature, index) => (
+              {/* Illustration */}
               <div
-                key={index}
-                className="bg-white/80 backdrop-blur-lg rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2"
+                className={`${
+                  feature.illustration === "right" ? "lg:col-start-1" : ""
+                } ${
+                  isVisible
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-10"
+                } transition-all duration-1000 delay-${index * 200 + 300}`}
               >
-                <div className={`w-20 h-20 bg-gradient-to-r ${feature.color} rounded-3xl flex items-center justify-center text-4xl mb-6 group-hover:rotate-12 transition-transform duration-500`}>
-                  {feature.icon}
+                <div className="relative">
+                  {/* Main illustration container */}
+                  <div className="relative w-full h-80 lg:h-96 bg-white rounded-3xl p-8 shadow-2xl">
+                    <div className="relative w-full h-full">
+                      {/* Person illustration */}
+                      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+                        <div className="w-24 h-24 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+                          <span className="text-white text-3xl">
+                            {feature.id === "everyone"
+                              ? "🚀"
+                              : feature.id === "web3"
+                              ? "🧘"
+                              : "💃"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Floating elements around person */}
+                      <div className="absolute top-8 left-8 w-6 h-6 bg-white rounded-full shadow-lg flex items-center justify-center animate-bounce">
+                        <span className="text-blue-600 text-sm">🔗</span>
+                      </div>
+                      <div
+                        className="absolute top-16 right-8 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center animate-bounce"
+                        style={{ animationDelay: "0.5s" }}
+                      >
+                        <span className="text-purple-600 text-sm">⚡</span>
+                      </div>
+                      <div
+                        className="absolute bottom-16 left-8 w-6 h-6 bg-white rounded-full shadow-lg flex items-center justify-center animate-bounce"
+                        style={{ animationDelay: "1s" }}
+                      >
+                        <span className="text-green-600 text-sm">✓</span>
+                      </div>
+                      <div
+                        className="absolute bottom-8 right-4 w-4 h-4 bg-white rounded-full shadow-lg flex items-center justify-center animate-bounce"
+                        style={{ animationDelay: "1.5s" }}
+                      >
+                        <span className="text-orange-600 text-xs">🎨</span>
+                      </div>
+
+                      {/* Background pattern */}
+                      <div className="absolute inset-0 opacity-10">
+                        <svg className="w-full h-full" viewBox="0 0 400 300">
+                          <defs>
+                            <pattern
+                              id={`pattern-${feature.id}`}
+                              x="0"
+                              y="0"
+                              width="40"
+                              height="40"
+                              patternUnits="userSpaceOnUse"
+                            >
+                              <circle
+                                cx="20"
+                                cy="20"
+                                r="2"
+                                fill="currentColor"
+                                className="text-purple-400"
+                              />
+                            </pattern>
+                          </defs>
+                          <rect
+                            width="100%"
+                            height="100%"
+                            fill={`url(#pattern-${feature.id})`}
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Floating cards */}
+                  <div className="absolute -top-4 -right-4 w-16 h-16 bg-white rounded-xl shadow-xl flex items-center justify-center transform rotate-12 animate-pulse">
+                    <span className="text-purple-600 text-xl">📄</span>
+                  </div>
+                  <div
+                    className="absolute -bottom-4 -left-4 w-12 h-12 bg-white rounded-lg shadow-lg flex items-center justify-center transform -rotate-12 animate-pulse"
+                    style={{ animationDelay: "0.5s" }}
+                  >
+                    <span className="text-blue-600 text-lg">🔐</span>
+                  </div>
                 </div>
-                <h4 className="text-2xl font-bold text-gray-900 mb-4 group-hover:gradient-text transition-all duration-300">
-                  {feature.title}
-                </h4>
-                <p className="text-gray-600 leading-relaxed text-lg">{feature.description}</p>
               </div>
-            ))}
+            </div>
           </div>
-        </div>
+        ))}
       </div>
     </section>
   );

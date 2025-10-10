@@ -19,9 +19,7 @@ export default function RootLayout({
     <html lang="id">
       <body className={inter.className}>
         <AuthProvider>
-          <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-            {children}
-          </div>
+          <div className="min-h-screen bg-white">{children}</div>
         </AuthProvider>
       </body>
     </html>
