@@ -60,15 +60,16 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Public endpoint: list verified artworks
+// Public endpoint: list verified artworks (excluding purchased ones)
 router.get("/public", async (req, res) => {
   try {
     const page = parseInt(req.query.page, 10) || 1;
     const limit = parseInt(req.query.limit, 10) || 50;
     const offset = (page - 1) * limit;
 
-    const items = await Artwork.findAll(limit, offset, "verified");
-    const total = await Artwork.count("verified");
+    // Get verified artworks that are NOT purchased (don't have "(Dibeli)" in title)
+    const items = await Artwork.findPublicVerified(limit, offset);
+    const total = await Artwork.countPublicVerified();
     const pages = Math.ceil(total / limit);
 
     res.json({
@@ -183,7 +184,7 @@ router.post("/buy", async (req, res) => {
       });
     }
 
-    // Create a copy of the artwork for the buyer
+    // Create a copy of the artwork for the buyer with unique hash
     const purchasedArtworkId = await Artwork.create({
       userId: userId,
       title: `${originalArtwork.title} (Dibeli)`,
@@ -192,6 +193,7 @@ router.post("/buy", async (req, res) => {
       fileSize: originalArtwork.file_size,
       fileType: originalArtwork.file_type,
       fileHash: originalArtwork.file_hash,
+      originalArtworkId: originalArtwork.id,
     });
 
     // Update status to verified since it's a purchased artwork

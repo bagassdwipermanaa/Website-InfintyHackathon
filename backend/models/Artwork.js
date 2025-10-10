@@ -107,11 +107,12 @@ class Artwork {
       fileSize,
       fileType,
       fileHash,
+      originalArtworkId,
     } = artworkData;
 
     const sql = `
-      INSERT INTO artworks (user_id, title, description, file_path, file_size, file_type, file_hash)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO artworks (user_id, title, description, file_path, file_size, file_type, file_hash, original_artwork_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     try {
@@ -123,6 +124,7 @@ class Artwork {
         fileSize,
         fileType,
         fileHash,
+        originalArtworkId || null,
       ]);
 
       return result.insertId;
@@ -196,6 +198,32 @@ class Artwork {
     `;
     const artworks = await query(sql, [userId, `%Original ID: ${originalArtworkId}%`]);
     return artworks[0] || null;
+  }
+
+  // Get public verified artworks (excluding purchased ones)
+  static async findPublicVerified(limit = 50, offset = 0) {
+    const sql = `
+      SELECT a.*, u.name as user_name, u.email as user_email,
+             au.full_name as verified_by_name
+      FROM artworks a
+      LEFT JOIN users u ON a.user_id = u.id
+      LEFT JOIN admin_users au ON a.verified_by = au.id
+      WHERE a.status = 'verified' AND a.title NOT LIKE '%(Dibeli)'
+      ORDER BY a.created_at DESC
+      LIMIT ? OFFSET ?
+    `;
+    return await query(sql, [limit, offset]);
+  }
+
+  // Count public verified artworks (excluding purchased ones)
+  static async countPublicVerified() {
+    const sql = `
+      SELECT COUNT(*) as count 
+      FROM artworks 
+      WHERE status = 'verified' AND title NOT LIKE '%(Dibeli)'
+    `;
+    const result = await query(sql);
+    return result[0].count;
   }
 }
 

@@ -12,16 +12,16 @@ export default function Header() {
   const router = useRouter();
 
   return (
-    <header className="bg-white shadow-lg sticky top-0 z-50">
+    <header className="bg-white/95 backdrop-blur-lg shadow-lg sticky top-0 z-50 border-b border-gray-200/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+            <Link href="/" className="flex items-center space-x-3 group">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
                 <span className="text-white font-bold text-xl">B</span>
               </div>
-              <span className="text-2xl font-bold text-gray-900">
+              <span className="text-2xl font-bold text-gray-900 group-hover:gradient-text transition-all duration-300">
                 BlockRights
               </span>
             </Link>
@@ -31,33 +31,30 @@ export default function Header() {
           <nav className="hidden md:flex items-center space-x-8">
             <Link
               href="/"
-              className="text-gray-700 hover:text-blue-600 transition duration-200"
+              className="text-gray-700 hover:text-blue-600 transition duration-300 font-medium relative group"
             >
               Beranda
-            </Link>
-            <Link
-              href="/karya"
-              className="text-gray-700 hover:text-blue-600 transition duration-200"
-            >
-              Karya Publik
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
             </Link>
             <Link
               href="/verify"
-              className="text-gray-700 hover:text-blue-600 transition duration-200"
+              className="text-gray-700 hover:text-blue-600 transition duration-300 font-medium relative group"
             >
               Verifikasi
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
             </Link>
             <Link
               href="/tentang"
-              className="text-gray-700 hover:text-blue-600 transition duration-200"
+              className="text-gray-700 hover:text-blue-600 transition duration-300 font-medium relative group"
             >
               Tentang
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
             </Link>
 
             {isAuthenticated && (
               <button
                 onClick={() => router.push("/dashboard")}
-                className="ml-2 px-3 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow hover:from-blue-700 hover:to-purple-700"
+                className="ml-4 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-lg hover:from-blue-700 hover:to-purple-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
               >
                 Dashboard
               </button>
@@ -75,22 +72,22 @@ export default function Header() {
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-200"
+                  className="flex items-center space-x-3 text-gray-700 hover:text-blue-600 transition duration-300 p-2 rounded-xl hover:bg-gray-50 group"
                 >
-                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">
+                  <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-white text-sm font-semibold">
                       {user?.name?.charAt(0).toUpperCase()}
                     </span>
                   </div>
-                  <span className="font-medium">{user?.name}</span>
+                  <span className="font-semibold">{user?.name}</span>
                   {!canVerify && (
                     <div
-                      className="w-2 h-2 bg-yellow-500 rounded-full"
+                      className="w-3 h-3 bg-yellow-500 rounded-full animate-pulse"
                       title="Profil belum lengkap"
                     ></div>
                   )}
                   <svg
-                    className="w-4 h-4"
+                    className="w-4 h-4 group-hover:rotate-180 transition-transform duration-300"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -105,36 +102,36 @@ export default function Header() {
                 </button>
 
                 {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-50">
+                  <div className="absolute right-0 mt-2 w-56 bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl border border-gray-200 z-50">
                     <div className="py-2">
                       <Link
                         href="/dashboard"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
                         onClick={() => setShowUserMenu(false)}
                       >
-                        Dashboard
+                        📊 Dashboard
                       </Link>
                       <Link
                         href="/profil"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
                         onClick={() => setShowUserMenu(false)}
                       >
-                        Profil
+                        👤 Profil
                         {!canVerify && (
-                          <span className="ml-2 text-xs text-yellow-600">
-                            (Belum Lengkap)
+                          <span className="ml-2 text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full">
+                            Belum Lengkap
                           </span>
                         )}
                       </Link>
-                      <div className="border-t border-gray-100"></div>
+                      <div className="border-t border-gray-100 my-2"></div>
                       <button
                         onClick={() => {
                           logout();
                           setShowUserMenu(false);
                         }}
-                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                        className="block w-full text-left px-6 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200"
                       >
-                        Keluar
+                        🚪 Keluar
                       </button>
                     </div>
                   </div>
@@ -144,13 +141,13 @@ export default function Header() {
               <>
                 <button
                   onClick={() => router.push("/login")}
-                  className="text-gray-700 hover:text-blue-600 transition duration-200"
+                  className="text-gray-700 hover:text-blue-600 transition duration-300 font-medium px-4 py-2 rounded-xl hover:bg-gray-50"
                 >
                   Masuk
                 </button>
                 <button
                   onClick={() => router.push("/register")}
-                  className="btn-primary"
+                  className="btn-primary px-6 py-2"
                 >
                   Daftar
                 </button>
@@ -162,7 +159,7 @@ export default function Header() {
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 hover:text-blue-600 transition duration-200"
+              className="text-gray-700 hover:text-blue-600 transition duration-300 p-2 rounded-xl hover:bg-gray-50"
             >
               <svg
                 className="w-6 h-6"
@@ -183,95 +180,94 @@ export default function Header() {
 
           {/* Mobile menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200">
-            <div className="flex flex-col space-y-4">
+          <div className="md:hidden py-6 border-t border-gray-200 bg-white/95 backdrop-blur-lg">
+            <div className="flex flex-col space-y-6">
               <Link
                 href="/"
-                className="text-gray-700 hover:text-blue-600 transition duration-200"
+                className="text-gray-700 hover:text-blue-600 transition duration-300 font-medium px-4 py-2 rounded-xl hover:bg-gray-50"
+                onClick={() => setIsMenuOpen(false)}
               >
-                Beranda
-              </Link>
-              <Link
-                href="/karya"
-                className="text-gray-700 hover:text-blue-600 transition duration-200"
-              >
-                Karya Publik
+                🏠 Beranda
               </Link>
               <Link
                 href="/verify"
-                className="text-gray-700 hover:text-blue-600 transition duration-200"
+                className="text-gray-700 hover:text-blue-600 transition duration-300 font-medium px-4 py-2 rounded-xl hover:bg-gray-50"
+                onClick={() => setIsMenuOpen(false)}
               >
-                Verifikasi
+                🔍 Verifikasi
               </Link>
               <Link
                 href="/tentang"
-                className="text-gray-700 hover:text-blue-600 transition duration-200"
+                className="text-gray-700 hover:text-blue-600 transition duration-300 font-medium px-4 py-2 rounded-xl hover:bg-gray-50"
+                onClick={() => setIsMenuOpen(false)}
               >
-                Tentang
+                ℹ️ Tentang
               </Link>
-              <div className="pt-4 border-t border-gray-200">
+              <div className="pt-6 border-t border-gray-200">
                 {isLoading ? (
-                  <div className="flex items-center space-x-2 mb-4">
-                    <div className="w-8 h-8 bg-gray-300 rounded-full animate-pulse"></div>
-                    <div className="w-20 h-4 bg-gray-300 rounded animate-pulse"></div>
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="w-10 h-10 bg-gray-300 rounded-full animate-pulse"></div>
+                    <div className="w-24 h-4 bg-gray-300 rounded animate-pulse"></div>
                   </div>
                 ) : isAuthenticated ? (
                   <>
-                    <div className="flex items-center space-x-2 mb-4">
-                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                        <span className="text-white text-sm font-medium">
+                    <div className="flex items-center space-x-3 mb-6 p-4 bg-gray-50 rounded-xl">
+                      <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                        <span className="text-white text-sm font-semibold">
                           {user?.name?.charAt(0).toUpperCase()}
                         </span>
                       </div>
-                      <span className="font-medium text-gray-900">
-                        {user?.name}
-                      </span>
-                      {!canVerify && (
-                        <div
-                          className="w-2 h-2 bg-yellow-500 rounded-full"
-                          title="Profil belum lengkap"
-                        ></div>
-                      )}
+                      <div>
+                        <span className="font-semibold text-gray-900 block">
+                          {user?.name}
+                        </span>
+                        {!canVerify && (
+                          <span className="text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full">
+                            Profil Belum Lengkap
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <Link
                       href="/dashboard"
-                      className="block text-gray-700 hover:text-blue-600 transition duration-200 mb-2"
+                      className="block text-gray-700 hover:text-blue-600 transition duration-300 font-medium px-4 py-3 rounded-xl hover:bg-gray-50 mb-2"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      Dashboard
+                      📊 Dashboard
                     </Link>
                     <Link
                       href="/profil"
-                      className="block text-gray-700 hover:text-blue-600 transition duration-200 mb-2"
+                      className="block text-gray-700 hover:text-blue-600 transition duration-300 font-medium px-4 py-3 rounded-xl hover:bg-gray-50 mb-4"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      Profil
-                      {!canVerify && (
-                        <span className="ml-2 text-xs text-yellow-600">
-                          (Belum Lengkap)
-                        </span>
-                      )}
+                      👤 Profil
                     </Link>
                     <button
                       onClick={() => {
                         logout();
                         setIsMenuOpen(false);
                       }}
-                      className="block w-full text-left text-red-600 hover:text-red-700 transition duration-200"
+                      className="block w-full text-left text-red-600 hover:text-red-700 transition duration-300 font-medium px-4 py-3 rounded-xl hover:bg-red-50"
                     >
-                      Keluar
+                      🚪 Keluar
                     </button>
                   </>
                 ) : (
                   <>
                     <button
-                      onClick={() => router.push("/login")}
-                      className="block w-full text-left text-gray-700 hover:text-blue-600 transition duration-200 mb-2"
+                      onClick={() => {
+                        router.push("/login");
+                        setIsMenuOpen(false);
+                      }}
+                      className="block w-full text-left text-gray-700 hover:text-blue-600 transition duration-300 font-medium px-4 py-3 rounded-xl hover:bg-gray-50 mb-3"
                     >
                       Masuk
                     </button>
                     <button
-                      onClick={() => router.push("/register")}
+                      onClick={() => {
+                        router.push("/register");
+                        setIsMenuOpen(false);
+                      }}
                       className="btn-primary w-full"
                     >
                       Daftar

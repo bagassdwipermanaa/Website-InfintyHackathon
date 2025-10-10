@@ -25,6 +25,7 @@ interface ArtworkCardProps {
 
 export default function ArtworkCard({ artwork, onUpdate, currentUserId }: ArtworkCardProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  // Generate unique record hash by combining file hash with artwork ID
   const recordHash = `${(artwork.fileHash || '').toString()}_${(artwork.id || '').toString()}`
   
   // Check if this artwork belongs to the current user
@@ -98,16 +99,24 @@ export default function ArtworkCard({ artwork, onUpdate, currentUserId }: Artwor
   }
 
   return (
-    <div className="card hover:shadow-xl transition duration-300">
-      <div className="flex justify-between items-start mb-4">
-        <div className="flex items-center space-x-3">
-          <div className="text-3xl">{getFileIcon(artwork.fileType)}</div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
+    <div className="card-hover group relative overflow-hidden">
+      {/* Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-purple-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+      
+      {/* Header */}
+      <div className="relative z-10 flex justify-between items-start mb-6">
+        <div className="flex items-center space-x-4">
+          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-300">
+            {getFileIcon(artwork.fileType)}
+          </div>
+          <div className="flex-1">
+            <h3 className="text-lg font-bold text-gray-900 line-clamp-1 group-hover:text-blue-600 transition-colors duration-300">
               {artwork.title}
             </h3>
-            <p className="text-sm text-gray-500">
-              {formatFileSize(artwork.fileSize)} • {formatDate(artwork.createdAt)}
+            <p className="text-sm text-gray-500 flex items-center space-x-2">
+              <span>{formatFileSize(artwork.fileSize)}</span>
+              <span>•</span>
+              <span>{formatDate(artwork.createdAt)}</span>
             </p>
           </div>
         </div>
@@ -115,7 +124,7 @@ export default function ArtworkCard({ artwork, onUpdate, currentUserId }: Artwor
         <div className="relative">
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-gray-400 hover:text-gray-600 transition duration-200"
+            className="text-gray-400 hover:text-gray-600 transition duration-200 p-2 rounded-lg hover:bg-gray-100"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
@@ -123,27 +132,27 @@ export default function ArtworkCard({ artwork, onUpdate, currentUserId }: Artwor
           </button>
           
           {isMenuOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-              <div className="py-1">
+            <div className="absolute right-0 mt-2 w-48 bg-white/95 backdrop-blur-lg rounded-xl shadow-2xl border border-gray-200 z-20">
+              <div className="py-2">
                 <button
                   onClick={copyHash}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
                 >
-                  Salin Hash
+                  📋 Salin Hash
                 </button>
                 {artwork.certificateUrl && (
                   <button
                     onClick={downloadCertificate}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
                   >
-                    Download Sertifikat
+                    📄 Download Sertifikat
                   </button>
                 )}
                 <button
                   onClick={() => setIsMenuOpen(false)}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
                 >
-                  Lihat Detail
+                  👁️ Lihat Detail
                 </button>
               </div>
             </div>
@@ -151,58 +160,64 @@ export default function ArtworkCard({ artwork, onUpdate, currentUserId }: Artwor
         </div>
       </div>
 
+      {/* Description */}
       {artwork.description && (
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-          {artwork.description}
-        </p>
+        <div className="relative z-10 mb-6">
+          <p className="text-gray-600 text-sm line-clamp-2 leading-relaxed">
+            {artwork.description}
+          </p>
+        </div>
       )}
 
-      <div className="flex items-center justify-between mb-4">
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(artwork.status)}`}>
+      {/* Status and NFT */}
+      <div className="relative z-10 flex items-center justify-between mb-6">
+        <span className={`px-3 py-1.5 rounded-full text-xs font-semibold ${getStatusColor(artwork.status)}`}>
           {getStatusText(artwork.status)}
         </span>
         
         {artwork.nftTokenId && (
-          <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
+          <span className="px-3 py-1.5 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 rounded-full text-xs font-semibold">
             NFT #{artwork.nftTokenId}
           </span>
         )}
       </div>
 
-      <div className="space-y-2">
+      {/* Details */}
+      <div className="relative z-10 space-y-3 mb-6">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-500">ID Upload:</span>
-          <span className="font-mono text-xs text-gray-700 bg-gray-100 px-2 py-1 rounded">
+          <span className="text-gray-500 font-medium">ID Upload:</span>
+          <span className="font-mono text-xs text-gray-700 bg-gray-100 px-3 py-1.5 rounded-lg">
             {(artwork.id || "").toString()}
           </span>
         </div>
 
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-500">Hash Rekaman:</span>
-          <span className="font-mono text-xs text-gray-700 bg-gray-100 px-2 py-1 rounded" title={`Hash Konten: ${artwork.fileHash || ''}`}>
+          <span className="text-gray-500 font-medium">Hash Rekaman:</span>
+          <span className="font-mono text-xs text-gray-700 bg-gray-100 px-3 py-1.5 rounded-lg" title={`Hash Konten: ${artwork.fileHash || ''}`}>
             {recordHash.substring(0, 8)}...{recordHash.substring(Math.max(0, recordHash.length - 8))}
           </span>
         </div>
       </div>
 
-      <div className="mt-4 pt-4 border-t border-gray-200">
-        <div className="flex space-x-2">
+      {/* Action Buttons */}
+      <div className="relative z-10 pt-6 border-t border-gray-200">
+        <div className="flex space-x-3">
           {isOwner ? (
             // Show verification and certificate buttons for owner
             <>
               <Link
                 href={`/verify?hash=${encodeURIComponent(artwork.fileHash || '')}&id=${encodeURIComponent(artwork.id)}`}
-                className="flex-1 text-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition duration-200"
+                className="flex-1 text-center px-4 py-3 text-sm font-semibold text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg"
               >
-                Verifikasi
+                🔍 Verifikasi
               </Link>
               
               {artwork.status === 'verified' && (
                 <button
                   onClick={downloadCertificate}
-                  className="flex-1 px-3 py-2 text-sm font-medium text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition duration-200"
+                  className="flex-1 px-4 py-3 text-sm font-semibold text-green-600 bg-green-50 rounded-xl hover:bg-green-100 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg"
                 >
-                  Sertifikat
+                  📜 Sertifikat
                 </button>
               )}
             </>
@@ -218,9 +233,14 @@ export default function ArtworkCard({ artwork, onUpdate, currentUserId }: Artwor
                 });
                 window.location.href = `/pembayaran?${params.toString()}`;
               }}
-              className="flex-1 px-3 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition duration-200"
+              className="flex-1 px-4 py-3 text-sm font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg group"
             >
-              Beli Karya
+              <span className="flex items-center justify-center">
+                💰 Beli Karya
+                <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </span>
             </button>
           )}
         </div>

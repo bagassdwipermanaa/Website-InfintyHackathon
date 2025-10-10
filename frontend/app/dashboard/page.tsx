@@ -110,179 +110,217 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <Header />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Selamat datang, {user?.name}!
+        <div className="mb-12 relative">
+          {/* Background Elements */}
+          <div className="absolute inset-0 grid-pattern opacity-10"></div>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse-slow"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse-slow"></div>
+          
+          <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center">
+            <div className="mb-6 lg:mb-0">
+              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                Selamat datang,{" "}
+                <span className="gradient-text">{user?.name}</span>!
               </h1>
-              <p className="text-gray-600 mt-2">
-                Kelola dan lindungi karya kreatif Anda dengan teknologi
-                blockchain
+              <p className="text-xl text-gray-600 max-w-2xl">
+                Kelola dan lindungi karya kreatif Anda dengan teknologi blockchain yang aman dan terpercaya
               </p>
             </div>
-            <div className="flex space-x-4">
+            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
               <button
                 onClick={() => setIsUploadModalOpen(true)}
-                className="btn-primary"
+                className="btn-primary text-lg px-8 py-4 group"
               >
-                Upload Karya Baru
+                <span className="flex items-center">
+                  📤 Upload Karya Baru
+                  <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </span>
               </button>
-              <button onClick={handleLogout} className="btn-secondary">
-                Keluar
+              <button onClick={handleLogout} className="btn-outline text-lg px-8 py-4 group">
+                <span className="flex items-center">
+                  🚪 Keluar
+                  <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H3" />
+                  </svg>
+                </span>
               </button>
             </div>
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="card">
-            <div className="flex items-center">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <svg
-                  className="w-6 h-6 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <div className="card-hover group">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <svg
+                    className="w-8 h-8 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-semibold text-gray-600">Total Karya</p>
+                  <p className="text-3xl font-bold text-gray-900 group-hover:gradient-text transition-all duration-300">
+                    {artworks.length}
+                  </p>
+                </div>
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Karya</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {artworks.length}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="card">
-            <div className="flex items-center">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <svg
-                  className="w-6 h-6 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">
-                  Terverifikasi
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {artworks.filter((a) => a.status === "verified").length}
-                </p>
+              <div className="text-right">
+                <div className="text-2xl">📁</div>
               </div>
             </div>
           </div>
 
-          <div className="card">
-            <div className="flex items-center">
-              <div className="p-3 bg-yellow-100 rounded-lg">
-                <svg
-                  className="w-6 h-6 text-yellow-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+          <div className="card-hover group">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <svg
+                    className="w-8 h-8 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-semibold text-gray-600">Terverifikasi</p>
+                  <p className="text-3xl font-bold text-gray-900 group-hover:gradient-text transition-all duration-300">
+                    {artworks.filter((a) => a.status === "verified").length}
+                  </p>
+                </div>
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Menunggu</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {artworks.filter((a) => a.status === "pending").length}
-                </p>
+              <div className="text-right">
+                <div className="text-2xl">✅</div>
               </div>
             </div>
           </div>
 
-          <div className="card">
-            <div className="flex items-center">
-              <div className="p-3 bg-red-100 rounded-lg">
-                <svg
-                  className="w-6 h-6 text-red-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-                  />
-                </svg>
+          <div className="card-hover group">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <svg
+                    className="w-8 h-8 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-semibold text-gray-600">Menunggu</p>
+                  <p className="text-3xl font-bold text-gray-900 group-hover:gradient-text transition-all duration-300">
+                    {artworks.filter((a) => a.status === "pending").length}
+                  </p>
+                </div>
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Dispute</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {artworks.filter((a) => a.status === "disputed").length}
-                </p>
+              <div className="text-right">
+                <div className="text-2xl">⏳</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="card-hover group">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <svg
+                    className="w-8 h-8 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                    />
+                  </svg>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-semibold text-gray-600">Dispute</p>
+                  <p className="text-3xl font-bold text-gray-900 group-hover:gradient-text transition-all duration-300">
+                    {artworks.filter((a) => a.status === "disputed").length}
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl">⚠️</div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Artworks Grid */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Karya Saya</h2>
-            <div className="flex space-x-2">
+        <div className="mb-12">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                Karya <span className="gradient-text">Saya</span>
+              </h2>
+              <p className="text-gray-600">Kelola dan pantau status karya kreatif Anda</p>
+            </div>
+            <div className="flex flex-wrap gap-3 mt-4 sm:mt-0">
               <button
                 onClick={() => setFilter("all")}
-                className={`px-4 py-2 text-sm font-medium rounded-lg border transition ${
+                className={`px-6 py-3 text-sm font-semibold rounded-xl border-2 transition-all duration-300 transform hover:-translate-y-0.5 ${
                   filter === "all"
-                    ? "text-blue-700 bg-blue-50 border-blue-300"
-                    : "text-gray-700 bg-white border-gray-300 hover:bg-gray-50"
+                    ? "text-blue-700 bg-blue-50 border-blue-300 shadow-lg"
+                    : "text-gray-700 bg-white border-gray-300 hover:bg-gray-50 hover:shadow-md"
                 }`}
               >
-                Semua
+                📁 Semua ({artworks.length})
               </button>
               <button
                 onClick={() => setFilter("verified")}
-                className={`px-4 py-2 text-sm font-medium rounded-lg border transition ${
+                className={`px-6 py-3 text-sm font-semibold rounded-xl border-2 transition-all duration-300 transform hover:-translate-y-0.5 ${
                   filter === "verified"
-                    ? "text-blue-700 bg-blue-50 border-blue-300"
-                    : "text-gray-700 bg-white border-gray-300 hover:bg-gray-50"
+                    ? "text-green-700 bg-green-50 border-green-300 shadow-lg"
+                    : "text-gray-700 bg-white border-gray-300 hover:bg-gray-50 hover:shadow-md"
                 }`}
               >
-                Terverifikasi
+                ✅ Terverifikasi ({artworks.filter((a) => a.status === "verified").length})
               </button>
               <button
                 onClick={() => setFilter("pending")}
-                className={`px-4 py-2 text-sm font-medium rounded-lg border transition ${
+                className={`px-6 py-3 text-sm font-semibold rounded-xl border-2 transition-all duration-300 transform hover:-translate-y-0.5 ${
                   filter === "pending"
-                    ? "text-blue-700 bg-blue-50 border-blue-300"
-                    : "text-gray-700 bg-white border-gray-300 hover:bg-gray-50"
+                    ? "text-yellow-700 bg-yellow-50 border-yellow-300 shadow-lg"
+                    : "text-gray-700 bg-white border-gray-300 hover:bg-gray-50 hover:shadow-md"
                 }`}
               >
-                Menunggu
+                ⏳ Menunggu ({artworks.filter((a) => a.status === "pending").length})
               </button>
             </div>
           </div>
@@ -290,38 +328,44 @@ export default function Dashboard() {
           {(artworks.filter((a) =>
             filter === "all" ? true : filter === "verified" ? a.status === "verified" : a.status === "pending"
           ).length === 0) ? (
-            <div className="text-center py-12">
-              <div className="w-24 h-24 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <svg
-                  className="w-12 h-12 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            <div className="text-center py-20">
+              <div className="card-hover max-w-md mx-auto">
+                <div className="w-32 h-32 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full mx-auto mb-8 flex items-center justify-center">
+                  <svg
+                    className="w-16 h-16 text-blue-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                  Belum Ada Karya
+                </h3>
+                <p className="text-gray-600 mb-8 text-lg leading-relaxed">
+                  Mulai upload karya pertama Anda untuk melindunginya dengan teknologi blockchain yang aman
+                </p>
+                <button
+                  onClick={() => setIsUploadModalOpen(true)}
+                  className="btn-primary text-lg px-8 py-4 group"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                  />
-                </svg>
+                  <span className="flex items-center">
+                    📤 Upload Karya Pertama
+                    <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </span>
+                </button>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                Belum ada karya
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Mulai upload karya pertama Anda untuk melindunginya dengan
-                blockchain
-              </p>
-              <button
-                onClick={() => setIsUploadModalOpen(true)}
-                className="btn-primary"
-              >
-                Upload Karya Pertama
-              </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {artworks
                 .filter((a) =>
                   filter === "all"
@@ -330,12 +374,18 @@ export default function Dashboard() {
                     ? a.status === "verified"
                     : a.status === "pending"
                 )
-                .map((artwork) => (
-                <ArtworkCard
+                .map((artwork, index) => (
+                <div
                   key={artwork.id}
-                  artwork={artwork}
-                  onUpdate={fetchArtworks}
-                />
+                  className="animate-fade-in"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <ArtworkCard
+                    artwork={artwork}
+                    onUpdate={fetchArtworks}
+                    currentUserId={user?.id}
+                  />
+                </div>
               ))}
             </div>
           )}
