@@ -12,6 +12,7 @@ interface Artwork {
   fileSize: number
   createdAt: string
   status: 'pending' | 'verified' | 'disputed'
+  userId: number
   certificateUrl?: string
   nftTokenId?: string
 }
@@ -19,11 +20,15 @@ interface Artwork {
 interface ArtworkCardProps {
   artwork: Artwork
   onUpdate: () => void
+  currentUserId?: number
 }
 
-export default function ArtworkCard({ artwork, onUpdate }: ArtworkCardProps) {
+export default function ArtworkCard({ artwork, onUpdate, currentUserId }: ArtworkCardProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const recordHash = `${(artwork.fileHash || '').toString()}_${(artwork.id || '').toString()}`
+  
+  // Check if this artwork belongs to the current user
+  const isOwner = currentUserId && artwork.userId === currentUserId
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -182,19 +187,40 @@ export default function ArtworkCard({ artwork, onUpdate }: ArtworkCardProps) {
 
       <div className="mt-4 pt-4 border-t border-gray-200">
         <div className="flex space-x-2">
-          <Link
-            href={`/verify?hash=${encodeURIComponent(artwork.fileHash || '')}&id=${encodeURIComponent(artwork.id)}`}
-            className="flex-1 text-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition duration-200"
-          >
-            Verifikasi
-          </Link>
-          
-          {artwork.status === 'verified' && (
+          {isOwner ? (
+            // Show verification and certificate buttons for owner
+            <>
+              <Link
+                href={`/verify?hash=${encodeURIComponent(artwork.fileHash || '')}&id=${encodeURIComponent(artwork.id)}`}
+                className="flex-1 text-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition duration-200"
+              >
+                Verifikasi
+              </Link>
+              
+              {artwork.status === 'verified' && (
+                <button
+                  onClick={downloadCertificate}
+                  className="flex-1 px-3 py-2 text-sm font-medium text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition duration-200"
+                >
+                  Sertifikat
+                </button>
+              )}
+            </>
+          ) : (
+            // Show buy artwork button for non-owners
             <button
-              onClick={downloadCertificate}
-              className="flex-1 px-3 py-2 text-sm font-medium text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition duration-200"
+              onClick={() => {
+                // Redirect to payment page with artwork details
+                const params = new URLSearchParams({
+                  artworkId: artwork.id,
+                  title: artwork.title,
+                  price: "100000", // Default price, can be made dynamic later
+                });
+                window.location.href = `/pembayaran?${params.toString()}`;
+              }}
+              className="flex-1 px-3 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition duration-200"
             >
-              Sertifikat
+              Beli Karya
             </button>
           )}
         </div>

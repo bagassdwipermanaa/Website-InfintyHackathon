@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ArtworkCard from "@/components/ArtworkCard";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Artwork {
   id: string;
@@ -14,6 +15,7 @@ interface Artwork {
   fileSize: number;
   createdAt: string;
   status: "pending" | "verified" | "disputed";
+  userId: number;
   certificateUrl?: string;
   nftTokenId?: string;
 }
@@ -22,6 +24,7 @@ export default function KaryaPublikPage() {
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchVerified = async () => {
@@ -41,6 +44,7 @@ export default function KaryaPublikPage() {
           fileSize: a.file_size || a.fileSize,
           createdAt: a.created_at || a.createdAt,
           status: (a.status as any) || "verified",
+          userId: a.user_id,
         }));
         setArtworks(normalized);
       } catch (e: any) {
@@ -80,7 +84,7 @@ export default function KaryaPublikPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {artworks.map((a: Artwork) => (
-                <ArtworkCard key={a.id} artwork={a} onUpdate={() => {}} />
+                <ArtworkCard key={a.id} artwork={a} onUpdate={() => {}} currentUserId={user?.id} />
               ))}
             </div>
           )}

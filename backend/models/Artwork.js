@@ -184,6 +184,19 @@ class Artwork {
     `;
     return await query(sql, [limit]);
   }
+
+  // Check if user owns a specific artwork (by original artwork ID)
+  static async findByUserIdAndArtworkId(userId, originalArtworkId) {
+    const sql = `
+      SELECT a.*, u.name as user_name, u.email as user_email
+      FROM artworks a
+      LEFT JOIN users u ON a.user_id = u.id
+      WHERE a.user_id = ? AND a.description LIKE ?
+      LIMIT 1
+    `;
+    const artworks = await query(sql, [userId, `%Original ID: ${originalArtworkId}%`]);
+    return artworks[0] || null;
+  }
 }
 
 module.exports = Artwork;

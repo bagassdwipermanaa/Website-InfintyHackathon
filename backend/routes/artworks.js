@@ -151,6 +151,66 @@ router.post("/register", async (req, res) => {
   }
 });
 
+// POST /api/artworks/buy - buy an artwork
+router.post("/buy", async (req, res) => {
+  try {
+    const userId = getUserIdFromAuthHeader(req);
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Token tidak valid" });
+    }
+
+    const { artworkId, paymentMethod } = req.body;
+
+    if (!artworkId || !paymentMethod) {
+      return res.status(400).json({
+        success: false,
+        message: "artworkId dan paymentMethod wajib diisi",
+      });
+    }
+
+    // Get the original artwork
+    const originalArtwork = await Artwork.findById(artworkId);
+    if (!originalArtwork) {
+      return res.status(404).json({ success: false, message: "Karya tidak ditemukan" });
+    }
+
+    // Check if user already owns this artwork
+    const existingOwnership = await Artwork.findByUserIdAndArtworkId(userId, artworkId);
+    if (existingOwnership) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Anda sudah memiliki karya ini" 
+      });
+    }
+
+    // Create a copy of the artwork for the buyer
+    const purchasedArtworkId = await Artwork.create({
+      userId: userId,
+      title: `${originalArtwork.title} (Dibeli)`,
+      description: `Karya ini dibeli dari ${originalArtwork.user_name}. Original ID: ${originalArtwork.id}. ${originalArtwork.description || ''}`,
+      filePath: originalArtwork.file_path,
+      fileSize: originalArtwork.file_size,
+      fileType: originalArtwork.file_type,
+      fileHash: originalArtwork.file_hash,
+    });
+
+    // Update status to verified since it's a purchased artwork
+    await Artwork.updateStatus(purchasedArtworkId, "verified");
+
+    // Get the created artwork with full details
+    const purchasedArtwork = await Artwork.findById(purchasedArtworkId);
+
+    res.status(201).json({ 
+      success: true, 
+      message: "Karya berhasil dibeli",
+      artwork: purchasedArtwork 
+    });
+  } catch (error) {
+    console.error("Buy artwork error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
 module.exports = router;
 
 
