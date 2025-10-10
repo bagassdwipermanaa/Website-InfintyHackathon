@@ -1,163 +1,281 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ArtworkCard from "@/components/ArtworkCard";
-import { useAuth } from "@/hooks/useAuth";
+import ChatBubble from "@/components/ChatBubble";
 
-interface Artwork {
-  id: string;
-  title: string;
-  description: string;
-  fileHash: string;
-  fileType: string;
-  fileSize: number;
-  createdAt: string;
-  status: "pending" | "verified" | "disputed";
-  userId: number;
-  certificateUrl?: string;
-  nftTokenId?: string;
-}
-
-export default function KaryaPublikPage() {
-  const [artworks, setArtworks] = useState<Artwork[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export default function Kontak() {
   const [isVisible, setIsVisible] = useState(false);
-  const { user } = useAuth();
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
 
   useEffect(() => {
     setIsVisible(true);
-    const fetchVerified = async () => {
-      try {
-        const res = await fetch("/api/artworks/public");
-        if (!res.ok) {
-          throw new Error("Gagal memuat karya");
-        }
-        const data = await res.json();
-        const list = data.data?.artworks || data.artworks || [];
-        const normalized = list.map((a: any) => ({
-          id: String(a.id),
-          title: a.title,
-          description: a.description,
-          fileHash: a.file_hash || a.fileHash,
-          fileType: a.file_type || a.fileType,
-          fileSize: a.file_size || a.fileSize,
-          createdAt: a.created_at || a.createdAt,
-          status: (a.status as any) || "verified",
-          userId: a.user_id,
-        }));
-        setArtworks(normalized);
-      } catch (e: any) {
-        setError(e.message || "Terjadi kesalahan");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchVerified();
   }, []);
 
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Handle form submission here
+    console.log("Form submitted:", formData);
+    alert("Terima kasih! Pesan Anda telah dikirim.");
+    setFormData({ name: "", email: "", subject: "", message: "" });
+  };
+
+  const contactInfo = [
+    {
+      icon: "📧",
+      title: "Email",
+      value: "hello@blockrights.id",
+      description: "Kirim email untuk pertanyaan umum",
+    },
+    {
+      icon: "📞",
+      title: "Telepon",
+      value: "+62 21 1234 5678",
+      description: "Hubungi kami untuk dukungan teknis",
+    },
+    {
+      icon: "📍",
+      title: "Alamat",
+      value: "Jakarta, Indonesia",
+      description: "Kantor pusat BlockRights",
+    },
+    {
+      icon: "💬",
+      title: "Live Chat",
+      value: "24/7 Support",
+      description: "Chat langsung dengan tim kami",
+    },
+  ];
+
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <main className="min-h-screen">
       <Header />
-      
+
       {/* Hero Section */}
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-hidden">
         {/* Background Elements */}
-        <div className="absolute inset-0 grid-pattern opacity-20"></div>
-        <div className="absolute top-10 right-10 w-64 h-64 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse-slow"></div>
-        <div className="absolute bottom-10 left-10 w-64 h-64 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse-slow"></div>
-        
-        <div className="relative z-10 max-w-7xl mx-auto">
-          <div className={`text-center mb-16 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-              Karya <span className="gradient-text">Publik</span>
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-10 w-4 h-4 bg-purple-400 rounded-full opacity-60 animate-pulse"></div>
+          <div className="absolute top-40 left-20 w-6 h-6 bg-blue-400 rotate-45 opacity-50 animate-bounce"></div>
+          <div className="absolute top-60 left-32 w-3 h-3 bg-green-400 rounded-full opacity-70"></div>
+
+          <div className="absolute top-32 right-20 w-4 h-4 bg-purple-400 rounded-full opacity-60 animate-pulse"></div>
+          <div className="absolute top-52 right-32 w-6 h-6 bg-blue-400 rotate-45 opacity-50 animate-bounce"></div>
+          <div className="absolute top-72 right-16 w-3 h-3 bg-green-400 rounded-full opacity-70"></div>
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto text-center">
+          <div
+            className={`transition-all duration-1000 ${
+              isVisible
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-10"
+            }`}
+          >
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-8">
+              Hubungi{" "}
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Kami
+              </span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              Kumpulan karya yang telah terverifikasi. Siapa pun dapat melihat bukti kepemilikan dan tanggal pendaftaran dengan teknologi blockchain.
+            <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed">
+              Ada pertanyaan? Butuh bantuan? Tim kami siap membantu Anda 24/7
             </p>
           </div>
+        </div>
+      </section>
 
-          {/* Stats */}
-          <div className={`grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-16 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <div className="card-hover text-center group">
-              <div className="text-3xl font-bold gradient-text mb-2 group-hover:scale-110 transition-transform duration-300">
-                {artworks.length}
+      {/* Contact Content */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* Contact Form */}
+            <div
+              className={`transition-all duration-1000 delay-200 ${
+                isVisible
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-10"
+              }`}
+            >
+              <div className="bg-white rounded-3xl p-8 shadow-2xl border border-gray-100">
+                <h2 className="text-3xl font-bold text-gray-900 mb-8">
+                  Kirim Pesan
+                </h2>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label
+                        htmlFor="name"
+                        className="block text-sm font-semibold text-gray-700 mb-2"
+                      >
+                        Nama Lengkap
+                      </label>
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 bg-white placeholder-gray-500 transition-all duration-300"
+                        placeholder="Masukkan nama lengkap"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="email"
+                        className="block text-sm font-semibold text-gray-700 mb-2"
+                      >
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 bg-white placeholder-gray-500 transition-all duration-300"
+                        placeholder="Masukkan email"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="subject"
+                      className="block text-sm font-semibold text-gray-700 mb-2"
+                    >
+                      Subjek
+                    </label>
+                    <input
+                      type="text"
+                      id="subject"
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 bg-white placeholder-gray-500 transition-all duration-300"
+                      placeholder="Masukkan subjek pesan"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="message"
+                      className="block text-sm font-semibold text-gray-700 mb-2"
+                    >
+                      Pesan
+                    </label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      required
+                      rows={6}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 bg-white placeholder-gray-500 transition-all duration-300 resize-none"
+                      placeholder="Tulis pesan Anda di sini..."
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
+                  >
+                    Kirim Pesan
+                  </button>
+                </form>
               </div>
-              <div className="text-gray-600">Karya Tersedia</div>
             </div>
-            <div className="card-hover text-center group">
-              <div className="text-3xl font-bold gradient-text mb-2 group-hover:scale-110 transition-transform duration-300">
-                100%
+
+            {/* Contact Info */}
+            <div
+              className={`transition-all duration-1000 delay-400 ${
+                isVisible
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-10"
+              }`}
+            >
+              <div className="space-y-8">
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                    Informasi Kontak
+                  </h2>
+                  <p className="text-lg text-gray-600 leading-relaxed">
+                    Tim kami siap membantu Anda dengan pertanyaan apa pun
+                    tentang BlockRights. Jangan ragu untuk menghubungi kami
+                    melalui berbagai saluran yang tersedia.
+                  </p>
+                </div>
+
+                <div className="space-y-6">
+                  {contactInfo.map((info, index) => (
+                    <div
+                      key={index}
+                      className="flex items-start space-x-4 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl hover:shadow-lg transition-all duration-300"
+                    >
+                      <div className="text-3xl">{info.icon}</div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                          {info.title}
+                        </h3>
+                        <p className="text-purple-600 font-medium mb-2">
+                          {info.value}
+                        </p>
+                        <p className="text-gray-600 text-sm">
+                          {info.description}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* FAQ Section */}
+                <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">
+                    Pertanyaan Umum
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="text-sm text-gray-600">
+                      <strong>Q:</strong> Bagaimana cara menggunakan
+                      BlockRights?
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      <strong>A:</strong> Daftar akun, upload karya Anda, dan
+                      dapatkan sertifikat kepemilikan blockchain.
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      <strong>Q:</strong> Apakah ada biaya untuk menggunakan
+                      platform?
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      <strong>A:</strong> BlockRights menawarkan paket gratis
+                      dan premium sesuai kebutuhan Anda.
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="text-gray-600">Terverifikasi</div>
-            </div>
-            <div className="card-hover text-center group">
-              <div className="text-3xl font-bold gradient-text mb-2 group-hover:scale-110 transition-transform duration-300">
-                24/7
-              </div>
-              <div className="text-gray-600">Akses Blockchain</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Artworks Section */}
-      <section className="py-10 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="card animate-pulse h-80">
-                  <div className="w-full h-32 bg-gray-200 rounded-xl mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-                  <div className="h-8 bg-gray-200 rounded"></div>
-                </div>
-              ))}
-            </div>
-          ) : error ? (
-            <div className="card bg-red-50 border-red-200 text-red-700 text-center py-12">
-              <div className="text-6xl mb-4">⚠️</div>
-              <h3 className="text-xl font-semibold mb-2">Gagal Memuat Karya</h3>
-              <p>{error}</p>
-            </div>
-          ) : artworks.length === 0 ? (
-            <div className="text-center py-20">
-              <div className="card-hover max-w-md mx-auto">
-                <div className="text-8xl mb-6">🎨</div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Belum Ada Karya</h3>
-                <p className="text-gray-600 mb-8">
-                  Belum ada karya terverifikasi yang tersedia untuk dilihat publik.
-                </p>
-                <button className="btn-primary">
-                  Lihat Cara Upload
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {artworks.map((artwork, index) => (
-                <div
-                  key={artwork.id}
-                  className={`transition-all duration-1000 delay-${index * 100} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-                >
-                  <ArtworkCard 
-                    artwork={artwork} 
-                    onUpdate={() => {}} 
-                    currentUserId={user?.id} 
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-      
       <Footer />
+      <ChatBubble />
     </main>
   );
 }
-
-
