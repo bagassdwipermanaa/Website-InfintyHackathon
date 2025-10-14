@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 interface Artwork {
@@ -12,7 +13,8 @@ interface Artwork {
   fileSize: number
   createdAt: string
   status: 'pending' | 'verified' | 'disputed'
-  userId: number
+  userId?: number
+  user_id?: number
   certificateUrl?: string
   nftTokenId?: string
 }
@@ -24,12 +26,27 @@ interface ArtworkCardProps {
 }
 
 export default function ArtworkCard({ artwork, onUpdate, currentUserId }: ArtworkCardProps) {
+  const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   // Generate unique record hash by combining file hash with artwork ID
   const recordHash = `${(artwork.fileHash || '').toString()}_${(artwork.id || '').toString()}`
   
   // Check if this artwork belongs to the current user
-  const isOwner = currentUserId && artwork.userId === currentUserId
+  const artworkUserId = artwork.userId || artwork.user_id
+  const isOwner = currentUserId && artworkUserId === currentUserId
+  
+  // Debug log
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🔍 Ownership check:', {
+      currentUserId,
+      artworkUserId,
+      'artwork.userId': artwork.userId,
+      'artwork.user_id': artwork.user_id,
+      isOwner
+    })
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -79,6 +96,15 @@ export default function ArtworkCard({ artwork, onUpdate, currentUserId }: Artwor
     return '📁'
   }
 
+  const getImagePreview = () => {
+    // Generate unique gradient based on file hash
+    const hash = artwork.fileHash || String(artwork.id)
+    const hue1 = parseInt(hash.substring(0, 2), 16) % 360
+    const hue2 = (hue1 + 60) % 360
+    
+    return `linear-gradient(135deg, hsl(${hue1}, 70%, 60%), hsl(${hue2}, 70%, 75%))`
+  }
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('id-ID', {
       year: 'numeric',
@@ -98,6 +124,38 @@ export default function ArtworkCard({ artwork, onUpdate, currentUserId }: Artwor
     }
   }
 
+  const handleDelete = async () => {
+    if (!showDeleteConfirm) {
+      setShowDeleteConfirm(true)
+      return
+    }
+
+    setIsDeleting(true)
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch(`/api/artworks/${artwork.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (response.ok) {
+        alert('Karya berhasil dihapus!')
+        onUpdate() // Refresh the list
+      } else {
+        const data = await response.json()
+        alert(data.message || 'Gagal menghapus karya')
+      }
+    } catch (error) {
+      console.error('Delete error:', error)
+      alert('Terjadi kesalahan saat menghapus karya')
+    } finally {
+      setIsDeleting(false)
+      setShowDeleteConfirm(false)
+    }
+  }
+
   return (
     <div className="card-hover group relative overflow-hidden">
       {/* Gradient Background */}
@@ -106,7 +164,10 @@ export default function ArtworkCard({ artwork, onUpdate, currentUserId }: Artwor
       {/* Header */}
       <div className="relative z-10 flex justify-between items-start mb-6">
         <div className="flex items-center space-x-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-300">
+          <div 
+            className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-300 shadow-md"
+            style={{ background: getImagePreview() }}
+          >
             {getFileIcon(artwork.fileType)}
           </div>
           <div className="flex-1">
@@ -201,25 +262,49 @@ export default function ArtworkCard({ artwork, onUpdate, currentUserId }: Artwor
 
       {/* Action Buttons */}
       <div className="relative z-10 pt-6 border-t border-gray-200">
-        <div className="flex space-x-3">
+        <div className="flex flex-col space-y-3">
           {isOwner ? (
-            // Show verification and certificate buttons for owner
+            // Show edit, verification and delete buttons for owner
             <>
-              <Link
-                href={`/verify?hash=${encodeURIComponent(artwork.fileHash || '')}&id=${encodeURIComponent(artwork.id)}`}
-                className="flex-1 text-center px-4 py-3 text-sm font-semibold text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg"
-              >
-                🔍 Verifikasi
-              </Link>
-              
-              {artwork.status === 'verified' && (
+              <div className="flex space-x-3">
                 <button
-                  onClick={downloadCertificate}
-                  className="flex-1 px-4 py-3 text-sm font-semibold text-green-600 bg-green-50 rounded-xl hover:bg-green-100 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg"
+                  onClick={() => {
+                    // TODO: Navigate to edit page
+                    console.log('Edit artwork:', artwork.id)
+                  }}
+                  className="flex-1 px-4 py-3 text-sm font-semibold text-purple-600 bg-purple-50 rounded-xl hover:bg-purple-100 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg"
                 >
-                  📜 Sertifikat
+                  ✏️ Edit Karya
                 </button>
-              )}
+                
+                <Link
+                  href={`/verify?hash=${encodeURIComponent(artwork.fileHash || '')}&id=${encodeURIComponent(artwork.id)}`}
+                  className="flex-1 text-center px-4 py-3 text-sm font-semibold text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg"
+                >
+                  🔍 Verifikasi
+                </Link>
+                
+                {artwork.status === 'verified' && (
+                  <button
+                    onClick={downloadCertificate}
+                    className="flex-1 px-4 py-3 text-sm font-semibold text-green-600 bg-green-50 rounded-xl hover:bg-green-100 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg"
+                  >
+                    📜 Sertifikat
+                  </button>
+                )}
+              </div>
+
+              <button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className={`w-full px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg ${
+                  showDeleteConfirm
+                    ? 'text-white bg-red-600 hover:bg-red-700'
+                    : 'text-red-600 bg-red-50 hover:bg-red-100'
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
+              >
+                {isDeleting ? '⏳ Menghapus...' : showDeleteConfirm ? '⚠️ Klik Lagi untuk Konfirmasi Hapus' : '🗑️ Hapus Karya'}
+              </button>
             </>
           ) : (
             // Show buy artwork button for non-owners
@@ -231,7 +316,7 @@ export default function ArtworkCard({ artwork, onUpdate, currentUserId }: Artwor
                   title: artwork.title,
                   price: "100000", // Default price, can be made dynamic later
                 });
-                window.location.href = `/pembayaran?${params.toString()}`;
+                router.push(`/pembayaran?${params.toString()}`);
               }}
               className="flex-1 px-4 py-3 text-sm font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg group"
             >

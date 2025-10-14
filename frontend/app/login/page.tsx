@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -25,6 +27,53 @@ export default function LoginPage() {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+  };
+
+  const handleGoogleLogin = async (credentialResponse: any) => {
+    try {
+      setIsLoading(true);
+      setMessage(null);
+
+      // Decode JWT token dari Google
+      const decoded: any = jwtDecode(credentialResponse.credential);
+      
+      const response = await fetch("/api/auth/google", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: decoded.email,
+          name: decoded.name,
+          googleId: decoded.sub,
+          picture: decoded.picture,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Simpan token dan user data
+        localStorage.setItem("token", data.data.token);
+        localStorage.setItem("refreshToken", data.data.refreshToken);
+        localStorage.setItem("user", JSON.stringify(data.data.user));
+        
+        setMessage({ type: "success", text: "Login dengan Google berhasil!" });
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 800);
+      } else {
+        setMessage({
+          type: "error",
+          text: data.message || "Login dengan Google gagal",
+        });
+      }
+    } catch (error) {
+      console.error("Google login error:", error);
+      setMessage({ type: "error", text: "Terjadi kesalahan saat login dengan Google" });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -186,13 +235,24 @@ export default function LoginPage() {
                 <span className="mr-2">🦊</span>
                 Masuk dengan MetaMask
               </button>
-              <button
-                type="button"
-                className="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 hover:shadow-md transition-all duration-200"
-              >
-                <span className="mr-2">🔍</span>
-                Masuk dengan Google
-              </button>
+              <div className="w-full">
+                <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
+                  <GoogleLogin
+                    onSuccess={handleGoogleLogin}
+                    onError={() => {
+                      setMessage({
+                        type: "error",
+                        text: "Login dengan Google gagal",
+                      });
+                    }}
+                    theme="outline"
+                    size="large"
+                    text="signin_with"
+                    shape="rectangular"
+                    width="100%"
+                  />
+                </GoogleOAuthProvider>
+              </div>
             </div>
 
             <div className="text-center space-y-2">

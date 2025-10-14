@@ -154,7 +154,7 @@ export default function Header() {
                         Untuk Bisnis
                       </button>
                       <button
-                        onClick={() => router.push("/register")}
+                        onClick={() => router.push("/market")}
                         className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-6 py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
                       >
                         Mulai Sekarang
@@ -278,7 +278,7 @@ export default function Header() {
                     </button>
                     <button
                       onClick={() => {
-                        router.push("/register");
+                        router.push("/market");
                         setIsMenuOpen(false);
                       }}
                       className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 w-full"

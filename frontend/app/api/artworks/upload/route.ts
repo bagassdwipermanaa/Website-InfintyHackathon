@@ -24,54 +24,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Kirim metadata ke backend (daftarkan karya menggunakan hash sisi klien)
-    // Hash cepat menggunakan Web Crypto API
+    // Hash file menggunakan Web Crypto API
     const arrayBuffer = await file.arrayBuffer();
     const digest = await crypto.subtle.digest("SHA-256", arrayBuffer);
     const hashArray = Array.from(new Uint8Array(digest));
     const fileHash = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 
-    const payload = new FormData();
-    payload.append("title", title);
-    payload.append("description", description);
-    payload.append("fileType", file.type || "application/octet-stream");
-    payload.append("fileSize", String((file as any).size || 0));
-    payload.append("fileHash", fileHash);
-
+    // Kirim metadata ke backend
     const response = await fetch(`http://localhost:5000/api/artworks/register`, {
       method: "POST",
-      headers: { Authorization: authHeader },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: authHeader,
+      },
       body: JSON.stringify({
         title,
         description,
         fileType: file.type || "application/octet-stream",
-        fileSize: (file as any).size || 0,
+        fileSize: file.size || 0,
         fileHash,
       }),
-    } as any);
+    });
 
-    // Fallback untuk lingkungan yang tidak mengizinkan JSON body pada fetch di atas
-    if (!response || !(response as any).ok) {
-      const response2 = await fetch(`http://localhost:5000/api/artworks/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: authHeader,
-        },
-        body: JSON.stringify({
-          title,
-          description,
-          fileType: file.type || "application/octet-stream",
-          fileSize: (file as any).size || 0,
-          fileHash,
-        }),
-      });
-      const data2 = await response2.json();
-      return NextResponse.json(data2, { status: response2.status });
-    }
-
-    const data = await (response as any).json();
-    return NextResponse.json(data, { status: (response as any).status });
+    const data = await response.json();
+    return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error("Artwork upload API error:", error);
     return NextResponse.json(

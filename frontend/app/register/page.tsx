@@ -1,328 +1,357 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Footer from "@/components/Footer";
-import ChatBubble from "@/components/ChatBubble";
+import Link from "next/link";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 
-export default function Marketplace() {
-  const [isVisible, setIsVisible] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
-  const categories = [
-    { id: "all", name: "Semua", icon: "🎨" },
-    { id: "art", name: "Seni Digital", icon: "🖼️" },
-    { id: "music", name: "Musik", icon: "🎵" },
-    { id: "video", name: "Video", icon: "🎬" },
-    { id: "photography", name: "Fotografi", icon: "📸" },
-    { id: "writing", name: "Tulisan", icon: "📝" },
-  ];
-
-  const artworks = [
-    {
-      id: 1,
-      title: "Digital Sunset",
-      artist: "Ahmad Rahman",
-      price: "0.5 ETH",
-      image: "🌅",
-      category: "art",
-      likes: 24,
-      verified: true,
-    },
-    {
-      id: 2,
-      title: "Cyber City",
-      artist: "Sarah Putri",
-      price: "1.2 ETH",
-      image: "🏙️",
-      category: "art",
-      likes: 156,
-      verified: true,
-    },
-    {
-      id: 3,
-      title: "Ocean Waves",
-      artist: "Budi Santoso",
-      price: "0.8 ETH",
-      image: "🌊",
-      category: "art",
-      likes: 89,
-      verified: false,
-    },
-    {
-      id: 4,
-      title: "Forest Dreams",
-      artist: "Maya Sari",
-      price: "0.3 ETH",
-      image: "🌲",
-      category: "art",
-      likes: 67,
-      verified: true,
-    },
-    {
-      id: 5,
-      title: "Space Journey",
-      artist: "Rizki Pratama",
-      price: "2.1 ETH",
-      image: "🚀",
-      category: "art",
-      likes: 234,
-      verified: true,
-    },
-    {
-      id: 6,
-      title: "Abstract Thoughts",
-      artist: "Dewi Lestari",
-      price: "0.7 ETH",
-      image: "🌀",
-      category: "art",
-      likes: 45,
-      verified: false,
-    },
-    {
-      id: 7,
-      title: "Urban Beat",
-      artist: "Fajar Nugroho",
-      price: "0.4 ETH",
-      image: "🎵",
-      category: "music",
-      likes: 123,
-      verified: true,
-    },
-    {
-      id: 8,
-      title: "Nature Symphony",
-      artist: "Indira Putri",
-      price: "0.9 ETH",
-      image: "🎶",
-      category: "music",
-      likes: 78,
-      verified: true,
-    },
-    {
-      id: 9,
-      title: "Street Photography",
-      artist: "Agus Wijaya",
-      price: "0.6 ETH",
-      image: "📸",
-      category: "photography",
-      likes: 156,
-      verified: true,
-    },
-    {
-      id: 10,
-      title: "Digital Poetry",
-      artist: "Sari Dewi",
-      price: "0.2 ETH",
-      image: "📝",
-      category: "writing",
-      likes: 34,
-      verified: false,
-    },
-    {
-      id: 11,
-      title: "Animated Short",
-      artist: "Rudi Hartono",
-      price: "1.5 ETH",
-      image: "🎬",
-      category: "video",
-      likes: 189,
-      verified: true,
-    },
-    {
-      id: 12,
-      title: "Cosmic Dance",
-      artist: "Lina Sari",
-      price: "1.8 ETH",
-      image: "✨",
-      category: "art",
-      likes: 267,
-      verified: true,
-    },
-  ];
-
-  const filteredArtworks = artworks.filter((artwork) => {
-    const matchesSearch =
-      artwork.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      artwork.artist.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "all" || artwork.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+export default function RegisterPage() {
+  const [formData, setFormData] = useState({
+    name: "",
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    walletAddress: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+  const router = useRouter();
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleGoogleRegister = async (credentialResponse: any) => {
+    try {
+      setIsLoading(true);
+      setMessage(null);
+
+      // Decode JWT token dari Google
+      const decoded: any = jwtDecode(credentialResponse.credential);
+      
+      const response = await fetch("/api/auth/google", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: decoded.email,
+          name: decoded.name,
+          googleId: decoded.sub,
+          picture: decoded.picture,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Simpan token dan user data
+        localStorage.setItem("token", data.data.token);
+        localStorage.setItem("refreshToken", data.data.refreshToken);
+        localStorage.setItem("user", JSON.stringify(data.data.user));
+        
+        setMessage({ type: "success", text: "Registrasi dengan Google berhasil! Mengalihkan ke dashboard..." });
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1500);
+      } else {
+        setMessage({
+          type: "error",
+          text: data.message || "Registrasi dengan Google gagal",
+        });
+      }
+    } catch (error) {
+      console.error("Google register error:", error);
+      setMessage({ type: "error", text: "Terjadi kesalahan saat registrasi dengan Google" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setMessage(null);
+
+    // Validasi input
+    if (!formData.name || !formData.username || !formData.email || !formData.password) {
+      setMessage({
+        type: "error",
+        text: "Semua field wajib diisi kecuali wallet address",
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setMessage({
+        type: "error",
+        text: "Password dan konfirmasi password tidak cocok",
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      setMessage({
+        type: "error",
+        text: "Password minimal 8 karakter",
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+          walletAddress: formData.walletAddress || null,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setMessage({ type: "success", text: "Registrasi berhasil! Mengalihkan ke dashboard..." });
+        
+        // Simpan token dan user data
+        localStorage.setItem("token", data.data.token);
+        localStorage.setItem("refreshToken", data.data.refreshToken);
+        localStorage.setItem("user", JSON.stringify(data.data.user));
+        
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1500);
+      } else {
+        setMessage({
+          type: "error",
+          text: data.message || "Registrasi gagal",
+        });
+      }
+    } catch (error) {
+      console.error("Register error:", error);
+      setMessage({ type: "error", text: "Terjadi kesalahan saat registrasi" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      {/* Sidebar Navigation */}
-      <div className="fixed left-0 top-0 h-full w-20 bg-white shadow-lg z-50 flex flex-col items-center py-6">
-        {/* Logo */}
-        <Link href="/" className="mb-8">
-          <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl flex items-center justify-center hover:scale-110 transition-transform duration-300">
-            <span className="text-white font-bold text-lg">B</span>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+          <div>
+            <div className="mx-auto h-16 w-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <span className="text-white text-2xl font-bold">B</span>
+            </div>
+            <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
+              Daftar ke BlockRights
+            </h2>
+            <p className="mt-2 text-center text-sm text-gray-600">
+              Lindungi karya digital Anda dengan blockchain
+            </p>
           </div>
-        </Link>
 
-        {/* Navigation Icons */}
-        <div className="flex flex-col space-y-6">
-          <button className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center hover:bg-purple-200 transition-colors duration-300">
-            <span className="text-2xl">🎨</span>
-          </button>
-          <button className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gray-200 transition-colors duration-300">
-            <span className="text-2xl">💎</span>
-          </button>
-          <button className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gray-200 transition-colors duration-300">
-            <span className="text-2xl">📊</span>
-          </button>
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+            {message && (
+              <div
+                className={`p-4 rounded-xl ${
+                  message.type === "success"
+                    ? "bg-green-50 text-green-800 border border-green-200"
+                    : "bg-red-50 text-red-800 border border-red-200"
+                }`}
+              >
+                {message.text}
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <div>
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  Nama Lengkap
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white transition-all duration-200"
+                  placeholder="Masukkan nama lengkap"
+                />
         </div>
 
-        {/* Add Button */}
-        <div className="mt-auto">
-          <button className="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300 shadow-lg">
-            <span className="text-white text-xl font-bold">+</span>
-          </button>
+              <div>
+                <label
+                  htmlFor="username"
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  Username
+                </label>
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  required
+                  value={formData.username}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white transition-all duration-200"
+                  placeholder="Pilih username"
+                />
         </div>
+
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  Email
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white transition-all duration-200"
+                  placeholder="email@example.com"
+                />
       </div>
 
-      {/* Main Content */}
-      <div className="ml-20">
-        {/* Header */}
-        <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
-          <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Welcome to BlockRights!
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Explore exclusive NFT collections, search for unique tokens, and
-                view detailed product pages. To purchase NFTs or access your
-                dashboard, please Login or Create an account.
-              </p>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white transition-all duration-200"
+                  placeholder="Minimal 8 karakter"
+                />
             </div>
-            <div className="flex items-center space-x-4">
-              <button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-6 py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-                Login
-              </button>
-            </div>
-          </div>
-        </header>
 
-        {/* Search Bar */}
-        <div className="bg-white px-6 py-4 border-b border-gray-200">
-          <div className="max-w-2xl">
-            <div className="relative">
+              <div>
+                <label
+                  htmlFor="confirmPassword"
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  Konfirmasi Password
+                </label>
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  required
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white transition-all duration-200"
+                  placeholder="Ulangi password"
+                />
+          </div>
+
+              <div>
+                <label
+                  htmlFor="walletAddress"
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  Wallet Address <span className="text-gray-400 font-normal">(Opsional)</span>
+                </label>
               <input
+                  id="walletAddress"
+                  name="walletAddress"
                 type="text"
-                placeholder="Search items, collections or users"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 bg-white placeholder-gray-500"
-              />
-              <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                <span className="text-gray-400 text-xl">🔍</span>
-              </div>
-            </div>
+                  value={formData.walletAddress}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white transition-all duration-200"
+                  placeholder="0x..."
+                />
           </div>
         </div>
 
-        {/* Categories */}
-        <div className="bg-white px-6 py-4 border-b border-gray-200">
-          <div className="flex space-x-4 overflow-x-auto">
-            {categories.map((category) => (
+            <div>
               <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-xl whitespace-nowrap transition-all duration-300 ${
-                  selectedCategory === category.id
-                    ? "bg-purple-100 text-purple-700 border border-purple-200"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
+                type="submit"
+                disabled={isLoading}
+                className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transition-all duration-200"
               >
-                <span className="text-lg">{category.icon}</span>
-                <span className="font-medium">{category.name}</span>
+                {isLoading ? "Memproses..." : "Daftar Sekarang"}
               </button>
-            ))}
-          </div>
         </div>
 
-        {/* Artworks Grid */}
-        <div className="p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-            {filteredArtworks.map((artwork, index) => (
-              <div
-                key={artwork.id}
-                className={`bg-white rounded-2xl p-4 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 ${
-                  isVisible
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-10"
-                }`}
-                style={{ transitionDelay: `${index * 50}ms` }}
-              >
-                {/* Artwork Image */}
-                <div className="aspect-square bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl mb-4 flex items-center justify-center text-6xl">
-                  {artwork.image}
+            <div className="text-center">
+              <span className="text-sm text-gray-600">Atau</span>
                 </div>
 
-                {/* Artwork Info */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-bold text-gray-900 text-sm truncate">
-                      {artwork.title}
-                    </h3>
-                    {artwork.verified && (
-                      <span className="text-blue-500 text-xs">✓</span>
-                    )}
+            <div className="w-full">
+              <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
+                <GoogleLogin
+                  onSuccess={handleGoogleRegister}
+                  onError={() => {
+                    setMessage({
+                      type: "error",
+                      text: "Registrasi dengan Google gagal",
+                    });
+                  }}
+                  theme="outline"
+                  size="large"
+                  text="signup_with"
+                  shape="rectangular"
+                  width="100%"
+                />
+              </GoogleOAuthProvider>
                   </div>
 
-                  <p className="text-gray-600 text-xs">by {artwork.artist}</p>
-
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-purple-600 text-sm">
-                      {artwork.price}
-                    </span>
-                    <div className="flex items-center space-x-1">
-                      <span className="text-red-500 text-xs">❤️</span>
-                      <span className="text-gray-500 text-xs">
-                        {artwork.likes}
+            <div className="text-center">
+              <span className="text-sm text-gray-600">
+                Sudah punya akun?{" "}
+                <Link
+                  href="/login"
+                  className="font-medium text-blue-600 hover:text-blue-500"
+                >
+                  Masuk di sini
+                </Link>
                       </span>
                     </div>
-                  </div>
+          </form>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="mt-4 flex space-x-2">
-                  <button className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition-all duration-300">
-                    Buy Now
-                  </button>
-                  <button className="bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-semibold py-2 px-3 rounded-lg transition-all duration-300">
-                    View
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Empty State */}
-          {filteredArtworks.length === 0 && (
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4">🔍</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                No artworks found
-              </h3>
-              <p className="text-gray-600">
-                Try adjusting your search or filter criteria
-              </p>
-            </div>
-          )}
+        <div className="text-center">
+          <Link
+            href="/"
+            className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            ← Kembali ke beranda
+          </Link>
         </div>
       </div>
-
-      <Footer />
-      <ChatBubble />
-    </main>
+    </div>
   );
 }

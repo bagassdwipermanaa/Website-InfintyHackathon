@@ -47,6 +47,13 @@ router.get("/", async (req, res) => {
     const total = items.length;
     const pages = Math.ceil(total / limit);
 
+    console.log('📦 Artworks data from DB:', items.map(a => ({
+      id: a.id,
+      user_id: a.user_id,
+      userId: a.userId,
+      title: a.title
+    })));
+
     res.json({
       success: true,
       data: {
@@ -85,17 +92,52 @@ router.get("/public", async (req, res) => {
   }
 });
 
-// Helper: extract userId from simple token format token-<id>-timestamp
+// Helper: extract userId from JWT or simple token format
+const jwt = require("jsonwebtoken");
+const JWT_SECRET = process.env.JWT_SECRET || "blockrights-secret-2024";
+
 function getUserIdFromAuthHeader(req) {
   const authHeader = req.headers["authorization"];
+  
+  console.log("🔑 Auth Header:", authHeader ? "Present" : "Missing");
+  
   if (!authHeader) return null;
+  
   const parts = authHeader.split(" ");
   const token = parts.length === 2 ? parts[1] : parts[0];
-  if (!token || !token.startsWith("token-")) return null;
-  const segments = token.split("-");
-  const idStr = segments[1];
-  const userId = parseInt(idStr, 10);
-  return Number.isNaN(userId) ? null : userId;
+  
+  if (!token) {
+    console.log("❌ No token found");
+    return null;
+  }
+  
+  console.log("🎫 Token preview:", token.substring(0, 20) + "...");
+  
+  // Try JWT first
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (decoded && decoded.id) {
+      console.log("✅ JWT valid, user ID:", decoded.id);
+      return decoded.id;
+    }
+  } catch (error) {
+    console.log("⚠️ JWT verification failed:", error.message);
+    // Not a valid JWT, try old format
+  }
+  
+  // Try old format: token-<id>-timestamp
+  if (token.startsWith("token-")) {
+    const segments = token.split("-");
+    const idStr = segments[1];
+    const userId = parseInt(idStr, 10);
+    if (!Number.isNaN(userId)) {
+      console.log("✅ Old format token, user ID:", userId);
+      return userId;
+    }
+  }
+  
+  console.log("❌ Token format not recognized");
+  return null;
 }
 
 // POST /api/artworks/register - register metadata of an uploaded file (client-hashed)
@@ -209,6 +251,43 @@ router.post("/buy", async (req, res) => {
     });
   } catch (error) {
     console.error("Buy artwork error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
+// DELETE /api/artworks/:id - delete an artwork
+router.delete("/:id", async (req, res) => {
+  try {
+    const userId = getUserIdFromAuthHeader(req);
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Token tidak valid" });
+    }
+
+    const artworkId = req.params.id;
+
+    // Get the artwork to check ownership
+    const artwork = await Artwork.findById(artworkId);
+    if (!artwork) {
+      return res.status(404).json({ success: false, message: "Karya tidak ditemukan" });
+    }
+
+    // Check if user owns this artwork
+    if (artwork.user_id !== userId) {
+      return res.status(403).json({ 
+        success: false, 
+        message: "Anda tidak memiliki izin untuk menghapus karya ini" 
+      });
+    }
+
+    // Delete the artwork
+    await Artwork.delete(artworkId);
+
+    res.json({ 
+      success: true, 
+      message: "Karya berhasil dihapus"
+    });
+  } catch (error) {
+    console.error("Delete artwork error:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 });

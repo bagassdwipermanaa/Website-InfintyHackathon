@@ -22,6 +22,8 @@ interface Artwork {
   fileSize: number;
   createdAt: string;
   status: "pending" | "verified" | "disputed";
+  userId?: number;
+  user_id?: number;
   certificateUrl?: string;
   nftTokenId?: string;
 }
@@ -45,6 +47,8 @@ export default function Dashboard() {
 
     try {
       const parsedUser = JSON.parse(userData);
+      console.log('👤 User data from localStorage:', parsedUser);
+      console.log('👤 User ID:', parsedUser?.id, 'Type:', typeof parsedUser?.id);
       setUser(parsedUser);
     } catch (error) {
       console.error("Error parsing user data:", error);
@@ -80,6 +84,10 @@ export default function Dashboard() {
           fileSize: a.file_size || a.fileSize,
           createdAt: a.created_at || a.createdAt,
           status: (a.status as any) || "pending",
+          userId: a.user_id || a.userId,  // ✅ TAMBAHKAN INI!
+          user_id: a.user_id,              // ✅ DAN INI!
+          certificateUrl: a.certificate_url || a.certificateUrl,
+          nftTokenId: a.nft_token_id || a.nftTokenId,
         }));
         setArtworks(normalized);
       }
@@ -374,19 +382,30 @@ export default function Dashboard() {
                     ? a.status === "verified"
                     : a.status === "pending"
                 )
-                .map((artwork, index) => (
-                <div
-                  key={artwork.id}
-                  className="animate-fade-in"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <ArtworkCard
-                    artwork={artwork}
-                    onUpdate={fetchArtworks}
-                    currentUserId={user?.id}
-                  />
-                </div>
-              ))}
+                .map((artwork, index) => {
+                  const userId = user?.id ? parseInt(user.id) : undefined;
+                  console.log('🎨 Rendering artwork:', {
+                    artworkId: artwork.id,
+                    'artwork.userId': artwork.userId,
+                    'artwork.user_id': (artwork as any).user_id,
+                    currentUserId: userId,
+                    userIdRaw: user?.id,
+                    fullArtwork: artwork
+                  });
+                  return (
+                    <div
+                      key={artwork.id}
+                      className="animate-fade-in"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <ArtworkCard
+                        artwork={artwork}
+                        onUpdate={fetchArtworks}
+                        currentUserId={userId}
+                      />
+                    </div>
+                  );
+                })}
             </div>
           )}
         </div>

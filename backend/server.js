@@ -6,6 +6,7 @@ require("dotenv").config();
 
 const { testConnection } = require("./config/database");
 const authRoutes = require("./routes/auth-database");
+const authGoogleRoutes = require("./routes/auth-google");
 const adminAuthRoutes = require("./routes/admin-auth");
 const adminDashboardRoutes = require("./routes/admin-dashboard");
 const adminUsersRoutes = require("./routes/admin-users");
@@ -55,6 +56,7 @@ app.get("/health", (req, res) => {
 
 // API Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/auth", authGoogleRoutes);
 app.use("/api/admin", adminAuthRoutes);
 app.use("/api/admin", adminDashboardRoutes);
 app.use("/api/admin/users", adminUsersRoutes);

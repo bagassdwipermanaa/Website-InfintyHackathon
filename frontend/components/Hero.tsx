@@ -62,7 +62,7 @@ export default function Hero() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-6 mb-16">
               <button
-                onClick={() => router.push("/register")}
+                onClick={() => router.push("/market")}
                 className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-8 py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 text-lg"
               >
                 Mulai Sekarang - Gratis

@@ -37,7 +37,8 @@ interface AuthContextType {
   canVerify: boolean;
   login: (
     email: string,
-    password: string
+    password: string,
+    rememberMe?: boolean
   ) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
   checkAuthStatus: () => Promise<void>;

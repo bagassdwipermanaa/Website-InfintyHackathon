@@ -190,6 +190,13 @@ class User {
     return result.affectedRows > 0;
   }
 
+  // Update Google ID
+  static async updateGoogleId(id, googleId) {
+    const sql = "UPDATE users SET google_id = ? WHERE id = ?";
+    const result = await query(sql, [googleId, id]);
+    return result.affectedRows > 0;
+  }
+
   // Delete user
   static async delete(id) {
     const sql = "DELETE FROM users WHERE id = ?";
