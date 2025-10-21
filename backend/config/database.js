@@ -6,7 +6,7 @@ const dbConfig = {
   host: process.env.DB_HOST || "pintu2.minecuta.com",
   port: process.env.DB_PORT || 3306,
   user: process.env.DB_USER || "hackaton",
-  password: process.env.DB_PASSWORD || "hackaton",
+  password: process.env.DB_PASSWORD || "bagas4777",
   database: process.env.DB_NAME || "blockrights",
   waitForConnections: true,
   connectionLimit: 10,

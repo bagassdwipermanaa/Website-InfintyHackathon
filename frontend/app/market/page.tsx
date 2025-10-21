@@ -7,21 +7,7 @@ import Footer from "@/components/Footer";
 import ChatBubble from "@/components/ChatBubble";
 import { useAuth } from "@/hooks/useAuth";
 import ArtworkCard from "@/components/ArtworkCard";
-
-interface Artwork {
-  id: string;
-  title: string;
-  description: string;
-  fileHash: string;
-  fileType: string;
-  fileSize: number;
-  createdAt: string;
-  status: "pending" | "verified" | "rejected";
-  userId?: number;
-  user_id?: number;
-  certificateUrl?: string;
-  nftTokenId?: string;
-}
+import { Artwork } from "@/types/artwork";
 
 export default function Marketplace() {
   const router = useRouter();

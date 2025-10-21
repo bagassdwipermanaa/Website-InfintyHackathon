@@ -13,20 +13,7 @@ interface User {
   walletAddress?: string;
 }
 
-interface Artwork {
-  id: string;
-  title: string;
-  description: string;
-  fileHash: string;
-  fileType: string;
-  fileSize: number;
-  createdAt: string;
-  status: "pending" | "verified" | "disputed";
-  userId?: number;
-  user_id?: number;
-  certificateUrl?: string;
-  nftTokenId?: string;
-}
+import { Artwork } from "@/types/artwork";
 
 export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null);

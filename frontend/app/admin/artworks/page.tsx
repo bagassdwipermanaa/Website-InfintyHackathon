@@ -3,21 +3,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-interface Artwork {
-  id: number;
-  title: string;
-  description: string;
-  file_hash: string;
-  file_type: string;
-  file_size: number;
-  status: "pending" | "verified" | "rejected" | "disputed";
-  created_at: string;
-  user_name: string;
-  user_email: string;
-}
+import { AdminArtwork } from "@/types/artwork";
 
 export default function AdminArtworksPage() {
-  const [artworks, setArtworks] = useState<Artwork[]>([]);
+  const [artworks, setArtworks] = useState<AdminArtwork[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");

@@ -4,20 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
-interface Artwork {
-  id: string
-  title: string
-  description: string
-  fileHash: string
-  fileType: string
-  fileSize: number
-  createdAt: string
-  status: 'pending' | 'verified' | 'disputed'
-  userId?: number
-  user_id?: number
-  certificateUrl?: string
-  nftTokenId?: string
-}
+import { Artwork } from "@/types/artwork";
 
 interface ArtworkCardProps {
   artwork: Artwork
