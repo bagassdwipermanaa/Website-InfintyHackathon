@@ -1,12 +1,12 @@
 "use client";
 
-import Header from "@/components/Header";
+import HomeHeader from "@/components/HomeHeader";
 import Footer from "@/components/Footer";
 
 export default function TentangPage() {
   return (
     <div className="min-h-screen bg-white">
-      <Header />
+      <HomeHeader />
 
       <main className="pt-20">
         {/* Hero Section */}

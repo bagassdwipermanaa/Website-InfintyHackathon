@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import ArtworkCard from "@/components/ArtworkCard";
 import { Artwork } from "@/types/artwork";
 
-export default function Marketplace() {
+export default function Koleksi() {
   const router = useRouter();
   const { user, isAuthenticated, logout, checkAuthStatus } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
@@ -22,23 +22,8 @@ export default function Marketplace() {
   useEffect(() => {
     setIsVisible(true);
     fetchArtworks();
-    // Force refresh auth status
     checkAuthStatus();
   }, []);
-
-  // Debug log untuk cek auth state
-  useEffect(() => {
-    console.log('🔐 Market Auth State:', {
-      user,
-      isAuthenticated,
-      userName: user?.name,
-      localStorage: {
-        hasToken: !!localStorage.getItem('token'),
-        hasUser: !!localStorage.getItem('user'),
-        userPreview: localStorage.getItem('user')?.substring(0, 50)
-      }
-    });
-  }, [user, isAuthenticated]);
 
   const fetchArtworks = async () => {
     try {
@@ -49,7 +34,6 @@ export default function Marketplace() {
         const data = await response.json();
         const list = data.data?.artworks || data.artworks || [];
         
-        // Normalisasi data
         const normalized = list.map((a: any) => ({
           id: String(a.id),
           title: a.title,
@@ -106,7 +90,7 @@ export default function Marketplace() {
               </Link>
               <Link 
                 href="/koleksi" 
-                className="flex items-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-300 px-3 py-2 rounded-lg hover:bg-purple-50"
+                className="flex items-center space-x-2 text-purple-600 bg-purple-50 px-3 py-2 rounded-lg font-medium"
               >
                 <span className="text-lg">💎</span>
                 <span className="font-medium">Koleksi</span>
@@ -197,6 +181,17 @@ export default function Marketplace() {
 
       {/* Main Content */}
       <div>
+        {/* Header */}
+        <div className="bg-gradient-to-r from-purple-50 to-blue-50 px-6 py-8">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+              💎 Koleksi BlockRights
+            </h1>
+            <p className="text-lg text-gray-600 mb-6">
+              Jelajahi koleksi eksklusif karya digital terverifikasi. Setiap karya memiliki sertifikat keaslian yang dapat diverifikasi.
+            </p>
+          </div>
+        </div>
 
         {/* Search Bar */}
         <div className="bg-white px-6 py-4 border-b border-gray-200">
@@ -204,7 +199,7 @@ export default function Marketplace() {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Search items, collections or users"
+                placeholder="Cari koleksi, karya, atau seniman..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 bg-white placeholder-gray-500"
@@ -222,7 +217,7 @@ export default function Marketplace() {
             <div className="text-center py-12">
               <div className="text-6xl mb-4">⏳</div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Memuat karya...
+                Memuat koleksi...
               </h3>
             </div>
           ) : (
@@ -250,9 +245,9 @@ export default function Marketplace() {
               {/* Empty State */}
               {filteredArtworks.length === 0 && (
                 <div className="text-center py-12">
-                  <div className="text-6xl mb-4">🔍</div>
+                  <div className="text-6xl mb-4">💎</div>
                   <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    Tidak ada karya ditemukan
+                    Belum ada koleksi ditemukan
                   </h3>
                   <p className="text-gray-600">
                     Coba sesuaikan kata kunci pencarian Anda
@@ -269,4 +264,3 @@ export default function Marketplace() {
     </main>
   );
 }
-

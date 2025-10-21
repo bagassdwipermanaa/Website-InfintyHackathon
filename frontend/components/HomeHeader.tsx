@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 
-export default function Header() {
+export default function HomeHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -47,18 +47,22 @@ export default function Header() {
                 {/* Navigation Links */}
                 <nav className="flex items-center space-x-4">
                   <Link
-                    href="/market"
-                    className="flex items-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-300 px-3 py-2 rounded-lg hover:bg-purple-50"
+                    href="/tentang"
+                    className="text-gray-700 hover:text-purple-600 transition duration-300 font-medium"
                   >
-                    <span className="text-lg">🎨</span>
-                    <span className="font-medium">Marketplace</span>
+                    Tentang
                   </Link>
                   <Link
-                    href="/koleksi"
-                    className="flex items-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-300 px-3 py-2 rounded-lg hover:bg-purple-50"
+                    href="/fitur"
+                    className="text-gray-700 hover:text-purple-600 transition duration-300 font-medium"
                   >
-                    <span className="text-lg">💎</span>
-                    <span className="font-medium">Koleksi</span>
+                    Media
+                  </Link>
+                  <Link
+                    href="/karya"
+                    className="text-gray-700 hover:text-purple-600 transition duration-300 font-medium"
+                  >
+                    Kontak
                   </Link>
                 </nav>
 
@@ -121,11 +125,6 @@ export default function Header() {
                               onClick={() => setShowUserMenu(false)}
                             >
                               👤 Profil
-                              {!canVerify && (
-                                <span className="ml-2 text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full">
-                                  Belum Lengkap
-                                </span>
-                              )}
                             </Link>
                             <div className="border-t border-gray-100 my-2"></div>
                             <button
@@ -186,20 +185,25 @@ export default function Header() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col space-y-6">
               <Link
-                href="/market"
-                className="flex items-center space-x-2 text-gray-700 hover:text-purple-600 transition duration-300 font-medium px-4 py-2 rounded-xl hover:bg-gray-50"
+                href="/tentang"
+                className="text-gray-700 hover:text-purple-600 transition duration-300 font-medium px-4 py-2 rounded-xl hover:bg-gray-50"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <span className="text-lg">🎨</span>
-                <span>Marketplace</span>
+                ℹ️ Tentang
               </Link>
               <Link
-                href="/koleksi"
-                className="flex items-center space-x-2 text-gray-700 hover:text-purple-600 transition duration-300 font-medium px-4 py-2 rounded-xl hover:bg-gray-50"
+                href="/fitur"
+                className="text-gray-700 hover:text-purple-600 transition duration-300 font-medium px-4 py-2 rounded-xl hover:bg-gray-50"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <span className="text-lg">💎</span>
-                <span>Koleksi</span>
+                📱 Media
+              </Link>
+              <Link
+                href="/karya"
+                className="text-gray-700 hover:text-purple-600 transition duration-300 font-medium px-4 py-2 rounded-xl hover:bg-gray-50"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                📞 Kontak
               </Link>
               <div className="pt-6 border-t border-gray-200">
                 {isLoading ? (
@@ -208,34 +212,28 @@ export default function Header() {
                     <div className="w-24 h-4 bg-gray-300 rounded animate-pulse"></div>
                   </div>
                 ) : isAuthenticated ? (
-                  <>
-                    <div className="flex items-center space-x-3 mb-6 p-4 bg-gray-50 rounded-xl">
-                      <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-3 mb-6">
+                      <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
                         <span className="text-white text-sm font-semibold">
                           {user?.name?.charAt(0).toUpperCase()}
                         </span>
                       </div>
                       <div>
-                        <span className="font-semibold text-gray-900 block">
-                          {user?.name}
-                        </span>
-                        {!canVerify && (
-                          <span className="text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full">
-                            Profil Belum Lengkap
-                          </span>
-                        )}
+                        <p className="font-semibold text-gray-900">{user?.name}</p>
+                        <p className="text-sm text-gray-500">{user?.email}</p>
                       </div>
                     </div>
                     <Link
                       href="/dashboard"
-                      className="block text-gray-700 hover:text-blue-600 transition duration-300 font-medium px-4 py-3 rounded-xl hover:bg-gray-50 mb-2"
+                      className="block text-gray-700 hover:text-purple-600 transition duration-300 font-medium px-4 py-2 rounded-xl hover:bg-gray-50"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       📊 Dashboard
                     </Link>
                     <Link
                       href="/profil"
-                      className="block text-gray-700 hover:text-blue-600 transition duration-300 font-medium px-4 py-3 rounded-xl hover:bg-gray-50 mb-4"
+                      className="block text-gray-700 hover:text-purple-600 transition duration-300 font-medium px-4 py-2 rounded-xl hover:bg-gray-50"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       👤 Profil
@@ -245,32 +243,32 @@ export default function Header() {
                         logout();
                         setIsMenuOpen(false);
                       }}
-                      className="block w-full text-left text-red-600 hover:text-red-700 transition duration-300 font-medium px-4 py-3 rounded-xl hover:bg-red-50"
+                      className="block w-full text-left text-red-600 hover:text-red-700 transition duration-300 font-medium px-4 py-2 rounded-xl hover:bg-red-50"
                     >
                       🚪 Keluar
                     </button>
-                  </>
+                  </div>
                 ) : (
-                  <>
+                  <div className="space-y-4">
                     <button
                       onClick={() => {
-                        router.push("/enterprise");
+                        router.push("/login");
                         setIsMenuOpen(false);
                       }}
-                      className="block w-full text-left text-gray-700 hover:text-purple-600 transition duration-300 font-medium px-4 py-3 rounded-xl bg-purple-100 hover:bg-purple-200 mb-3"
+                      className="w-full text-center bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                     >
-                      Untuk Bisnis
+                      Masuk
                     </button>
                     <button
                       onClick={() => {
-                        router.push("/market");
+                        router.push("/register");
                         setIsMenuOpen(false);
                       }}
-                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 w-full"
+                      className="w-full text-center text-purple-600 hover:text-purple-700 font-semibold px-6 py-3 rounded-xl border-2 border-purple-200 hover:border-purple-300 transition-all duration-300"
                     >
-                      Mulai Sekarang
+                      Daftar
                     </button>
-                  </>
+                  </div>
                 )}
               </div>
             </div>

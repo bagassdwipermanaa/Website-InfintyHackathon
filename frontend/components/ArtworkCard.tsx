@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 import { Artwork } from "@/types/artwork";
+import ProfileChecker from './ProfileChecker';
 
 interface ArtworkCardProps {
   artwork: Artwork
@@ -295,25 +296,27 @@ export default function ArtworkCard({ artwork, onUpdate, currentUserId }: Artwor
             </>
           ) : (
             // Show buy artwork button for non-owners
-            <button
-              onClick={() => {
-                // Redirect to payment page with artwork details
-                const params = new URLSearchParams({
-                  artworkId: artwork.id,
-                  title: artwork.title,
-                  price: "100000", // Default price, can be made dynamic later
-                });
-                router.push(`/pembayaran?${params.toString()}`);
-              }}
-              className="flex-1 px-4 py-3 text-sm font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg group"
-            >
-              <span className="flex items-center justify-center">
-                💰 Beli Karya
-                <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </span>
-            </button>
+            <ProfileChecker artworkTitle={artwork.title} artworkId={artwork.id}>
+              <button
+                onClick={() => {
+                  // Redirect to payment page with artwork details
+                  const params = new URLSearchParams({
+                    artworkId: artwork.id,
+                    title: artwork.title,
+                    price: "100000", // Default price, can be made dynamic later
+                  });
+                  router.push(`/pembayaran?${params.toString()}`);
+                }}
+                className="flex-1 px-4 py-3 text-sm font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg group"
+              >
+                <span className="flex items-center justify-center">
+                  💰 Beli Karya
+                  <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </span>
+              </button>
+            </ProfileChecker>
           )}
         </div>
       </div>

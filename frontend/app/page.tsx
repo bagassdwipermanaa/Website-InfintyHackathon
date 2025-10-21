@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Header from "@/components/Header";
+import HomeHeader from "@/components/HomeHeader";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
 import Spotlight from "@/components/Spotlight";
@@ -13,7 +13,7 @@ import ChatBubble from "@/components/ChatBubble";
 export default function Home() {
   return (
     <main className="min-h-screen">
-      <Header />
+      <HomeHeader />
       <Hero />
       <Features />
       <Spotlight />

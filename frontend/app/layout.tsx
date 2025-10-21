@@ -8,6 +8,11 @@ export const metadata = {
   title: "BlockRights - Digital Copyright Verifier",
   description:
     "Platform blockchain untuk verifikasi hak cipta dan kepemilikan digital karya kreatif",
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({

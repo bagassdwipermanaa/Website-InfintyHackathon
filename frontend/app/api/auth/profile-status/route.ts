@@ -1,36 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export const dynamic = "force-dynamic";
-
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get("authorization");
-
-    if (!authHeader) {
+    const token = request.headers.get("authorization")?.replace("Bearer ", "");
+    
+    if (!token) {
       return NextResponse.json(
-        { success: false, message: "Authorization header required" },
+        { error: "Token tidak ditemukan" },
         { status: 401 }
       );
     }
 
-    const response = await fetch(
-      `http://localhost:5000/api/auth/profile-status`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: authHeader,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    // Get user data from token (simple implementation)
+    const response = await fetch(`${process.env.BACKEND_URL}/api/auth/me`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-    const data = await response.json();
+    if (!response.ok) {
+      return NextResponse.json(
+        { error: "Token tidak valid" },
+        { status: 401 }
+      );
+    }
 
-    return NextResponse.json(data, { status: response.status });
+    const userData = await response.json();
+    
+    return NextResponse.json({
+      success: true,
+      user: userData.user,
+    });
   } catch (error) {
-    console.error("Profile status API error:", error);
+    console.error("Error checking profile status:", error);
     return NextResponse.json(
-      { success: false, message: "Internal server error" },
+      { error: "Server error" },
       { status: 500 }
     );
   }

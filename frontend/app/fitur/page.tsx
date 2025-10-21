@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Header from "@/components/Header";
+import HomeHeader from "@/components/HomeHeader";
 import Footer from "@/components/Footer";
 import ChatBubble from "@/components/ChatBubble";
 
@@ -71,7 +71,7 @@ export default function Media() {
 
   return (
     <main className="min-h-screen">
-      <Header />
+      <HomeHeader />
 
       {/* Hero Section */}
       <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-hidden">
