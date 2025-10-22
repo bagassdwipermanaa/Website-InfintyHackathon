@@ -36,15 +36,13 @@ router.get("/", async (req, res) => {
       LIMIT ? OFFSET ?
     `;
 
-    const artworks = await Artwork.query(artworksQuery, [
-      ...params,
-      limit,
-      offset,
-    ]);
+    const queryParams = status !== "all" ? [...params, limit, offset] : [limit, offset];
+    const artworks = await Artwork.query(artworksQuery, queryParams);
 
     // Get total count
     const countQuery = `SELECT COUNT(*) as total FROM artworks a ${whereClause}`;
-    const countResult = await Artwork.query(countQuery, params);
+    const countParams = status !== "all" ? params : [];
+    const countResult = await Artwork.query(countQuery, countParams);
     const total = countResult[0].total;
     const pages = Math.ceil(total / limit);
 

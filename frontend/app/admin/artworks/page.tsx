@@ -29,11 +29,10 @@ export default function AdminArtworksPage() {
 
   const fetchArtworks = async () => {
     try {
+      setIsLoading(true);
+      setError(null);
       const token = localStorage.getItem("adminToken");
-      const url =
-        statusFilter === "all"
-          ? `/api/admin/artworks?page=${currentPage}`
-          : `/api/admin/artworks?page=${currentPage}&status=${statusFilter}`;
+      const url = `/api/admin/artworks?page=${currentPage}&status=${statusFilter}`;
 
       const response = await fetch(url, {
         headers: {
@@ -43,8 +42,8 @@ export default function AdminArtworksPage() {
 
       if (response.ok) {
         const data = await response.json();
-        setArtworks(data.data.artworks);
-        setTotalPages(data.data.pagination.pages);
+        setArtworks(data.data.artworks || []);
+        setTotalPages(data.data.pagination.pages || 1);
       } else if (response.status === 401) {
         localStorage.removeItem("adminToken");
         router.push("/admin/login");
@@ -184,7 +183,20 @@ export default function AdminArtworksPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {artworks.map((artwork) => (
+              {artworks.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                    <div className="text-lg mb-2">📝</div>
+                    <div>Tidak ada artwork ditemukan</div>
+                    <div className="text-sm mt-1">
+                      {statusFilter === "all" 
+                        ? "Belum ada artwork yang diupload" 
+                        : `Tidak ada artwork dengan status "${statusFilter}"`}
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                artworks.map((artwork) => (
                 <tr key={artwork.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
@@ -251,7 +263,8 @@ export default function AdminArtworksPage() {
                     </div>
                   </td>
                 </tr>
-              ))}
+                ))
+              )}
             </tbody>
           </table>
         </div>

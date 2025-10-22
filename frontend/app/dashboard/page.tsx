@@ -277,7 +277,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Artworks Grid */}
+        {/* Artworks Section */}
         <div className="mb-12">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
             <div>
@@ -360,7 +360,7 @@ export default function Dashboard() {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <div className="space-y-6">
               {artworks
                 .filter((a) =>
                   filter === "all"
