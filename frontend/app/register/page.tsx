@@ -59,9 +59,9 @@ export default function RegisterPage() {
         localStorage.setItem("refreshToken", data.data.refreshToken);
         localStorage.setItem("user", JSON.stringify(data.data.user));
         
-        setMessage({ type: "success", text: "Registrasi dengan Google berhasil! Mengalihkan ke dashboard..." });
+        setMessage({ type: "success", text: "Registrasi dengan Google berhasil! Mengalihkan ke marketplace..." });
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push("/market");
         }, 1500);
       } else {
         setMessage({
@@ -136,7 +136,7 @@ export default function RegisterPage() {
         localStorage.setItem("user", JSON.stringify(data.data.user));
         
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push("/market");
         }, 1500);
       } else {
         setMessage({

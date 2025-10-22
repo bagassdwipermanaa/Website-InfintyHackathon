@@ -125,7 +125,7 @@ export default function AdminArtworksPage() {
     );
   }
 
-  return (
+  return (  
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">

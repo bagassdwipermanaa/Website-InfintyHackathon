@@ -1,6 +1,7 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
 import { AuthProvider } from "@/hooks/useAuth";
+import { Web3Provider } from "@/hooks/useWeb3";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,9 +24,11 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body className={inter.className}>
-        <AuthProvider>
-          <div className="min-h-screen bg-white">{children}</div>
-        </AuthProvider>
+        <Web3Provider>
+          <AuthProvider>
+            <div className="min-h-screen bg-white">{children}</div>
+          </AuthProvider>
+        </Web3Provider>
       </body>
     </html>
   );

@@ -1,0 +1,31 @@
+{
+  "name": "blockrights-contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts untuk BlockRights NFT Marketplace",
+  "main": "index.js",
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "deploy:local": "npx hardhat run scripts/deploy.js --network localhost",
+    "deploy:testnet": "npx hardhat run scripts/deploy.js --network testnet",
+    "deploy:mainnet": "npx hardhat run scripts/deploy.js --network mainnet",
+    "verify": "npx hardhat verify",
+    "node": "npx hardhat node",
+    "clean": "npx hardhat clean"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@openzeppelin/contracts": "^4.9.3",
+    "hardhat": "^2.17.2",
+    "dotenv": "^16.3.1"
+  },
+  "keywords": [
+    "blockchain",
+    "nft",
+    "marketplace",
+    "solidity",
+    "ethereum"
+  ],
+  "author": "BlockRights Team",
+  "license": "MIT"
+}

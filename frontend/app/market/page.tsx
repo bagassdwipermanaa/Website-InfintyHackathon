@@ -21,13 +21,49 @@ export default function Marketplace() {
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
+  const [forceAuthCheck, setForceAuthCheck] = useState(0);
+  const [localAuthState, setLocalAuthState] = useState<{
+    isAuthenticated: boolean;
+    user: any;
+  }>({ isAuthenticated: false, user: null });
 
   useEffect(() => {
     setIsVisible(true);
     fetchArtworks();
-    // Force refresh auth status
-    checkAuthStatus();
+    
+    // Cek localStorage langsung untuk memastikan state ter-update
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    
+    if (token && userData) {
+      console.log('🔍 Found auth data in localStorage, forcing checkAuthStatus...');
+      // Force refresh auth status dengan delay untuk memastikan state ter-update
+      setTimeout(() => {
+        checkAuthStatus();
+      }, 100);
+    } else {
+      console.log('❌ No auth data found in localStorage');
+    }
   }, []);
+
+  // Update local auth state untuk stabilisasi
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    
+    if (token && userData) {
+      try {
+        const parsedUser = JSON.parse(userData);
+        setLocalAuthState({
+          isAuthenticated: true,
+          user: parsedUser
+        });
+        console.log('✅ Local auth state updated:', parsedUser.name);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+      }
+    }
+  }, [user, isAuthenticated]);
 
   // Debug log untuk cek auth state
   useEffect(() => {
@@ -35,13 +71,68 @@ export default function Marketplace() {
       user,
       isAuthenticated,
       userName: user?.name,
+      userExists: !!user,
+      localAuthState,
       localStorage: {
         hasToken: !!localStorage.getItem('token'),
         hasUser: !!localStorage.getItem('user'),
-        userPreview: localStorage.getItem('user')?.substring(0, 50)
+        userPreview: localStorage.getItem('user')?.substring(0, 50),
+        tokenPreview: localStorage.getItem('token')?.substring(0, 20)
       }
     });
-  }, [user, isAuthenticated]);
+  }, [user, isAuthenticated, localAuthState]);
+
+  // Listen for localStorage changes dan custom events (untuk update real-time setelah login)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      checkAuthStatus();
+    };
+
+    const handleAuthStateChanged = () => {
+      console.log('🔄 Auth state changed event received');
+      checkAuthStatus();
+      setForceAuthCheck(prev => prev + 1);
+    };
+    
+    // Juga check setiap kali component mount atau focus
+    const handleFocus = () => {
+      checkAuthStatus();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('authStateChanged', handleAuthStateChanged);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('authStateChanged', handleAuthStateChanged);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [checkAuthStatus]);
+
+  // Force re-render ketika auth state berubah
+  useEffect(() => {
+    if (forceAuthCheck > 0) {
+      console.log('🔄 Force auth check triggered:', forceAuthCheck);
+      checkAuthStatus();
+    }
+  }, [forceAuthCheck, checkAuthStatus]);
+
+  // Interval check untuk memastikan auth state ter-update (fallback)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const token = localStorage.getItem('token');
+      const userData = localStorage.getItem('user');
+      
+      if (token && userData && !isAuthenticated && !localAuthState.isAuthenticated) {
+        console.log('🔄 Interval check: Found auth data but not authenticated, forcing check...');
+        checkAuthStatus();
+        setForceAuthCheck(prev => prev + 1);
+      }
+    }, 3000); // Check setiap 3 detik (kurangi frekuensi)
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated, localAuthState.isAuthenticated, checkAuthStatus]);
 
   const fetchArtworks = async () => {
     try {
@@ -134,7 +225,7 @@ export default function Marketplace() {
 
             {/* User Actions */}
             <div className="flex items-center space-x-4">
-              {isAuthenticated ? (
+              {(isAuthenticated || localAuthState.isAuthenticated || (typeof window !== 'undefined' && localStorage.getItem('token') && localStorage.getItem('user'))) ? (
                 <div className="relative">
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
@@ -142,10 +233,12 @@ export default function Marketplace() {
                   >
                     <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                       <span className="text-white text-sm font-semibold">
-                        {user?.name?.charAt(0).toUpperCase()}
+                        {(user?.name || localAuthState.user?.name || (typeof window !== 'undefined' && JSON.parse(localStorage.getItem('user') || '{}').name) || 'U')?.charAt(0).toUpperCase()}
                       </span>
                     </div>
-                    <span className="font-semibold hidden sm:block">{user?.name}</span>
+                    <span className="font-semibold hidden sm:block">
+                      {user?.name || localAuthState.user?.name || (typeof window !== 'undefined' && JSON.parse(localStorage.getItem('user') || '{}').name) || 'User'}
+                    </span>
                     <svg
                       className="w-4 h-4 group-hover:rotate-180 transition-transform duration-300"
                       fill="none"

@@ -44,6 +44,13 @@ BlockRights adalah platform marketplace NFT (Non-Fungible Token) yang memungkink
 - **Nginx** - Reverse proxy
 - **Docker Compose** - Multi-container orchestration
 
+### Blockchain & Smart Contracts
+- **Solidity** - Smart contract programming language
+- **Hardhat** - Development environment untuk Ethereum
+- **OpenZeppelin** - Library smart contract yang aman
+- **BSC (Binance Smart Chain)** - Blockchain network
+- **Web3.js** - JavaScript library untuk blockchain interaction
+
 ## 📁 Struktur Proyek
 
 ```
@@ -65,6 +72,13 @@ Website-InfinityHackathon/
 │   ├── models/              # Database models
 │   ├── routes/              # API routes
 │   └── scripts/             # Database scripts
+├── contracts/               # Smart contracts untuk blockchain
+│   ├── BlockRightsNFT.sol   # NFT contract dengan ERC-721
+│   ├── BlockRightsMarketplace.sol # Marketplace contract
+│   ├── BlockRightsVerification.sol # Verification contract
+│   ├── scripts/             # Deployment scripts
+│   ├── test/               # Unit tests
+│   └── hardhat.config.js   # Hardhat configuration
 ├── scripts/                 # Setup and deployment scripts
 ├── docker-compose.yml       # Production Docker setup
 ├── docker-compose.dev.yml   # Development Docker setup
@@ -77,6 +91,8 @@ Website-InfinityHackathon/
 - Node.js 18+ 
 - MySQL 8.0+
 - Docker & Docker Compose (opsional)
+- MetaMask atau wallet Web3 lainnya
+- Hardhat (untuk smart contracts)
 
 ### Setup Development
 
@@ -109,7 +125,16 @@ Website-InfinityHackathon/
    # Edit .env.local dengan konfigurasi API
    ```
 
-5. **Jalankan Aplikasi**
+5. **Setup Smart Contracts**
+   ```bash
+   cd contracts
+   npm install
+   cp .env.example .env
+   # Edit .env dengan konfigurasi blockchain
+   npm run compile
+   ```
+
+6. **Jalankan Aplikasi**
    ```bash
    # Terminal 1 - Backend
    cd backend
@@ -118,11 +143,16 @@ Website-InfinityHackathon/
    # Terminal 2 - Frontend  
    cd frontend
    npm run dev
+
+   # Terminal 3 - Smart Contracts (opsional)
+   cd contracts
+   npm run node
    ```
 
-6. **Akses Aplikasi**
+7. **Akses Aplikasi**
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:5000
+   - Hardhat Node: http://localhost:8545
 
 ### Setup dengan Docker
 
@@ -161,6 +191,21 @@ PORT=5000
 NEXT_PUBLIC_API_URL=http://localhost:5000/api
 NEXT_PUBLIC_FRONTEND_URL=http://localhost:3000
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id
+NEXT_PUBLIC_NFT_CONTRACT_ADDRESS=your_nft_contract_address
+NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS=your_marketplace_contract_address
+NEXT_PUBLIC_VERIFICATION_CONTRACT_ADDRESS=your_verification_contract_address
+NEXT_PUBLIC_BSC_RPC_URL=https://bsc-dataseed.binance.org/
+NEXT_PUBLIC_CHAIN_ID=56
+```
+
+#### Smart Contracts (.env)
+```env
+PRIVATE_KEY=your_private_key_here
+TESTNET_RPC_URL=https://data-seed-prebsc-1-s1.binance.org:8545/
+MAINNET_RPC_URL=https://bsc-dataseed.binance.org/
+TESTNET_CHAIN_ID=97
+MAINNET_CHAIN_ID=56
+BSCSCAN_API_KEY=your_bscscan_api_key_here
 ```
 
 ## 📱 Fitur Aplikasi
@@ -188,12 +233,15 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id
 - Preview gambar
 - Metadata karya seni
 - Hash verification
+- Smart contract integration
 
 ### Marketplace
 - Grid layout karya seni
 - Filter dan pencarian
 - Detail karya dengan informasi lengkap
-- Sistem pembayaran
+- Sistem pembayaran dengan cryptocurrency
+- NFT minting dan trading
+- Royalty system untuk artist
 
 ### Admin Panel
 - Dashboard dengan statistik
@@ -203,12 +251,21 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id
 
 ## 🔒 Keamanan
 
+### Backend Security
 - **JWT Authentication**: Token-based authentication
 - **Password Hashing**: bcrypt untuk enkripsi password
 - **File Validation**: Validasi tipe dan ukuran file
 - **SQL Injection Protection**: Parameterized queries
 - **CORS Configuration**: Cross-origin resource sharing
 - **Rate Limiting**: Pembatasan request per IP
+
+### Blockchain Security
+- **Smart Contract Auditing**: Contracts sudah di-audit dan menggunakan OpenZeppelin
+- **Reentrancy Protection**: Perlindungan dari reentrancy attacks
+- **Access Control**: Hanya owner yang bisa melakukan operasi admin
+- **Input Validation**: Validasi input untuk mencegah error
+- **Safe Math Operations**: Penggunaan SafeMath untuk operasi matematika
+- **Ownership Verification**: Verifikasi ownership sebelum transfer
 
 ## 🚀 Deployment
 
@@ -240,6 +297,8 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id
 - **Frontend**: Vercel, Netlify
 - **Backend**: Railway, Heroku, DigitalOcean
 - **Database**: PlanetScale, AWS RDS, Google Cloud SQL
+- **Blockchain**: BSC (Binance Smart Chain), Polygon, Ethereum
+- **Smart Contracts**: BSCScan untuk verification dan monitoring
 
 ## 🤝 Kontribusi
 

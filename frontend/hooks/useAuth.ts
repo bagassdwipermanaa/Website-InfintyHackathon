@@ -65,15 +65,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const userData = localStorage.getItem("user");
       const refreshToken = localStorage.getItem("refreshToken");
 
+      console.log('🔍 checkAuthStatus called:', { hasToken: !!token, hasUserData: !!userData });
+
       // First, try to use cached user data if available
       if (userData && token) {
         try {
           const parsedUser = JSON.parse(userData);
+          console.log('✅ Using cached user data:', parsedUser.name);
           setUser(parsedUser);
           setCanVerify(true); // Assume can verify if we have cached data
+          setIsLoading(false);
+          return; // Exit early if we have valid cached data
         } catch (error) {
           console.error("Error parsing cached user data:", error);
-          localStorage.removeItem("user");
+          // Don't remove user data immediately, try server verification first
         }
       }
 
@@ -113,7 +118,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Token expired, try to refresh
         await refreshAccessToken();
       } else {
-        // Token invalid, clear everything
+        // Token invalid, but don't clear everything immediately
+        console.log('⚠️ Token invalid, but keeping cached data for now');
+        // Only clear if we don't have cached data
+        if (!userData) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          localStorage.removeItem("refreshToken");
+          setUser(null);
+          setProfileCompleteness(null);
+          setCanVerify(false);
+        }
+      }
+    } catch (error) {
+      console.error("Auth check failed:", error);
+      // Don't clear everything on network error, keep cached data
+      console.log('⚠️ Network error, keeping cached data');
+      // Only clear if we don't have cached data
+      if (!localStorage.getItem("user")) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         localStorage.removeItem("refreshToken");
@@ -121,14 +143,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfileCompleteness(null);
         setCanVerify(false);
       }
-    } catch (error) {
-      console.error("Auth check failed:", error);
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      localStorage.removeItem("refreshToken");
-      setUser(null);
-      setProfileCompleteness(null);
-      setCanVerify(false);
     } finally {
       setIsLoading(false);
     }
@@ -248,6 +262,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         setUser(data.data.user);
         setCanVerify(true);
+        // Trigger custom event untuk update state di komponen lain
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('authStateChanged'));
+        }
         return { success: true };
       } else {
         return { success: false, message: data.message || "Login failed" };

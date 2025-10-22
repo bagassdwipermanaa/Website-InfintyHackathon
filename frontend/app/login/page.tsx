@@ -59,9 +59,12 @@ export default function LoginPage() {
         localStorage.setItem("user", JSON.stringify(data.data.user));
         
         setMessage({ type: "success", text: "Login dengan Google berhasil!" });
+        // Trigger custom event untuk update state di komponen lain
+        window.dispatchEvent(new CustomEvent('authStateChanged'));
+        // Tunggu sebentar agar state ter-update sebelum redirect
         setTimeout(() => {
-          router.push("/dashboard");
-        }, 800);
+          router.push("/market");
+        }, 1000);
       } else {
         setMessage({
           type: "error",
@@ -100,9 +103,12 @@ export default function LoginPage() {
 
       if (result.success) {
         setMessage({ type: "success", text: "Login berhasil!" });
+        // Trigger custom event untuk update state di komponen lain
+        window.dispatchEvent(new CustomEvent('authStateChanged'));
+        // Tunggu sebentar agar state ter-update sebelum redirect
         setTimeout(() => {
-          router.push("/dashboard");
-        }, 800);
+          router.push("/market");
+        }, 1000);
       } else {
         setMessage({
           type: "error",
@@ -228,13 +234,6 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-3">
-              <button
-                type="button"
-                className="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 hover:shadow-md transition-all duration-200"
-              >
-                <span className="mr-2">🦊</span>
-                Masuk dengan MetaMask
-              </button>
               <div className="w-full">
                 <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
                   <GoogleLogin
@@ -255,7 +254,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="text-center space-y-2">
+            <div className="text-center">
               <span className="text-sm text-gray-600">
                 Belum punya akun?{" "}
                 <Link
@@ -265,17 +264,6 @@ export default function LoginPage() {
                   Daftar di sini
                 </Link>
               </span>
-              <div className="text-center">
-                <span className="text-sm text-gray-500">
-                  Admin?{" "}
-                  <Link
-                    href="/admin/login"
-                    className="font-medium text-purple-600 hover:text-purple-500"
-                  >
-                    Login Admin
-                  </Link>
-                </span>
-              </div>
             </div>
           </form>
         </div>
