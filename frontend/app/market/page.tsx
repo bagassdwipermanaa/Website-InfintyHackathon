@@ -15,9 +15,12 @@ export default function Marketplace() {
   const [isVisible, setIsVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [sortBy, setSortBy] = useState("newest");
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 1000000 });
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
@@ -78,7 +81,23 @@ export default function Marketplace() {
     const matchesSearch =
       artwork.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       artwork.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesSearch;
+    
+    const matchesCategory = selectedCategory === "all" || 
+      (selectedCategory === "verified" && artwork.status === "verified") ||
+      (selectedCategory === "pending" && artwork.status === "pending");
+    
+    return matchesSearch && matchesCategory;
+  }).sort((a, b) => {
+    switch (sortBy) {
+      case "newest":
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      case "oldest":
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      case "title":
+        return a.title.localeCompare(b.title);
+      default:
+        return 0;
+    }
   });
 
   return (
@@ -195,29 +214,149 @@ export default function Marketplace() {
         </div>
       </nav>
 
-      {/* Main Content */}
-      <div>
+      {/* Hero Section */}
+      <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+              Discover Digital Art
+            </h1>
+            <p className="text-xl md:text-2xl text-purple-100 mb-8 max-w-3xl mx-auto">
+              Explore, collect, and trade verified digital artworks on the blockchain
+            </p>
 
         {/* Search Bar */}
-        <div className="bg-white px-6 py-4 border-b border-gray-200">
-          <div className="max-w-2xl">
+            <div className="max-w-2xl mx-auto">
             <div className="relative">
               <input
                 type="text"
-                placeholder="Search items, collections or users"
+                  placeholder="Search artworks, artists, or collections..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 bg-white placeholder-gray-500"
-              />
-              <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                <span className="text-gray-400 text-xl">🔍</span>
+                  className="w-full px-6 py-4 pl-14 pr-4 bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl focus:ring-2 focus:ring-purple-400 focus:border-transparent text-white placeholder-purple-200"
+                />
+                <div className="absolute left-5 top-1/2 transform -translate-y-1/2">
+                  <span className="text-purple-200 text-xl">🔍</span>
+                </div>
+                <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-xl transition-colors duration-300">
+                  Search
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Filter Sidebar */}
+          <div className="lg:w-80 flex-shrink-0">
+            <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-bold text-gray-900">Filters</h3>
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="lg:hidden text-gray-500 hover:text-gray-700"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className={`space-y-6 ${showFilters ? 'block' : 'hidden lg:block'}`}>
+                {/* Category Filter */}
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Category</h4>
+                  <div className="space-y-2">
+                    {[
+                      { value: "all", label: "All Items", count: artworks.length },
+                      { value: "verified", label: "Verified", count: artworks.filter(a => a.status === "verified").length },
+                      { value: "pending", label: "Pending", count: artworks.filter(a => a.status === "pending").length },
+                    ].map((category) => (
+                      <button
+                        key={category.value}
+                        onClick={() => setSelectedCategory(category.value)}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors duration-200 ${
+                          selectedCategory === category.value
+                            ? "bg-purple-100 text-purple-700 font-medium"
+                            : "text-gray-600 hover:bg-gray-100"
+                        }`}
+                      >
+                        <span>{category.label}</span>
+                        <span className="bg-gray-200 text-gray-600 px-2 py-1 rounded-full text-xs">
+                          {category.count}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Sort By */}
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Sort By</h4>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  >
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="title">Title A-Z</option>
+                  </select>
+                </div>
+
+                {/* Price Range */}
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Price Range</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="number"
+                        placeholder="Min"
+                        value={priceRange.min}
+                        onChange={(e) => setPriceRange({...priceRange, min: parseInt(e.target.value) || 0})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      />
+                      <span className="text-gray-500">to</span>
+                      <input
+                        type="number"
+                        placeholder="Max"
+                        value={priceRange.max}
+                        onChange={(e) => setPriceRange({...priceRange, max: parseInt(e.target.value) || 1000000})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      />
+                    </div>
+                  </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Artworks Grid */}
-        <div className="p-6">
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">
+                {filteredArtworks.length} Artworks Found
+              </h2>
+              <div className="flex items-center space-x-4">
+                <span className="text-sm text-gray-500">View:</span>
+                <div className="flex bg-gray-100 rounded-lg p-1">
+                  <button className="p-2 bg-white rounded-md shadow-sm">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                  </button>
+                  <button className="p-2 text-gray-500 hover:text-gray-700">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
           {loading ? (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">⏳</div>
@@ -227,7 +366,7 @@ export default function Marketplace() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {filteredArtworks.map((artwork, index) => (
                   <div
                     key={artwork.id}
@@ -255,12 +394,13 @@ export default function Marketplace() {
                     Tidak ada karya ditemukan
                   </h3>
                   <p className="text-gray-600">
-                    Coba sesuaikan kata kunci pencarian Anda
+                      Coba sesuaikan kata kunci pencarian atau filter Anda
                   </p>
                 </div>
               )}
             </>
           )}
+          </div>
         </div>
       </div>
 
