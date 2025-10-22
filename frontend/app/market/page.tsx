@@ -209,7 +209,7 @@ export default function Marketplace() {
             <div className="hidden md:flex items-center space-x-8">
               <Link 
                 href="/market" 
-                className="flex items-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-300 px-3 py-2 rounded-lg hover:bg-purple-50"
+                className="flex items-center space-x-2 text-purple-600 bg-purple-50 px-3 py-2 rounded-lg font-medium"
               >
                 <span className="text-lg">🎨</span>
                 <span className="font-medium">Marketplace</span>
@@ -221,6 +221,15 @@ export default function Marketplace() {
                 <span className="text-lg">💎</span>
                 <span className="font-medium">Koleksi</span>
               </Link>
+              {(isAuthenticated || localAuthState.isAuthenticated || (typeof window !== 'undefined' && localStorage.getItem('token') && localStorage.getItem('user'))) && (
+                <Link 
+                  href="/upload" 
+                  className="flex items-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-300 px-3 py-2 rounded-lg hover:bg-purple-50"
+                >
+                  <span className="text-lg">📤</span>
+                  <span className="font-medium">Upload Karya</span>
+                </Link>
+              )}
             </div>
 
             {/* User Actions */}

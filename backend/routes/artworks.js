@@ -292,6 +292,50 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// GET /api/artworks/purchased - get user's purchased artworks
+router.get("/purchased", async (req, res) => {
+  try {
+    const userId = getUserIdFromAuthHeader(req);
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Token tidak valid" });
+    }
+
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 50;
+    const offset = (page - 1) * limit;
+
+    // Get purchased artworks (artworks with original_artwork_id not null)
+    const items = await Artwork.findPurchasedByUserId(userId, limit, offset);
+    const total = items.length;
+    const pages = Math.ceil(total / limit);
+
+    console.log('🛒 Purchased artworks data from DB:', items.map(a => ({
+      id: a.id,
+      title: a.title,
+      originalId: a.original_artwork_id,
+      status: a.status
+    })));
+
+    res.json({
+      success: true,
+      data: {
+        artworks: items,
+        pagination: {
+          page,
+          limit,
+          total,
+          pages,
+          hasNext: page < pages,
+          hasPrev: page > 1,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Get purchased artworks error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
 module.exports = router;
 
 

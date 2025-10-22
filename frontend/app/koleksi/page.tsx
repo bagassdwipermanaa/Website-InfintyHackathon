@@ -21,14 +21,38 @@ export default function Koleksi() {
 
   useEffect(() => {
     setIsVisible(true);
-    fetchArtworks();
     checkAuthStatus();
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchArtworks();
+    } else {
+      setArtworks([]);
+    }
+  }, [isAuthenticated]);
 
   const fetchArtworks = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/artworks/public");
+      
+      // Check if user is authenticated
+      if (!isAuthenticated) {
+        setArtworks([]);
+        return;
+      }
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setArtworks([]);
+        return;
+      }
+
+      const response = await fetch("/api/artworks/purchased", {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       
       if (response.ok) {
         const data = await response.json();
@@ -42,17 +66,19 @@ export default function Koleksi() {
           fileType: a.file_type || a.fileType,
           fileSize: a.file_size || a.fileSize,
           createdAt: a.created_at || a.createdAt,
-          status: (a.status as any) || "pending",
+          status: (a.status as any) || "verified",
           userId: a.user_id || a.userId,
           user_id: a.user_id,
           certificateUrl: a.certificate_url || a.certificateUrl,
           nftTokenId: a.nft_token_id || a.nftTokenId,
+          originalTitle: a.original_title,
+          originalCreatorName: a.original_creator_name,
         }));
         
         setArtworks(normalized);
       }
     } catch (error) {
-      console.error("Error fetching artworks:", error);
+      console.error("Error fetching purchased artworks:", error);
     } finally {
       setLoading(false);
     }
@@ -95,6 +121,15 @@ export default function Koleksi() {
                 <span className="text-lg">💎</span>
                 <span className="font-medium">Koleksi</span>
               </Link>
+              {isAuthenticated && (
+                <Link 
+                  href="/upload" 
+                  className="flex items-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-300 px-3 py-2 rounded-lg hover:bg-purple-50"
+                >
+                  <span className="text-lg">📤</span>
+                  <span className="font-medium">Upload Karya</span>
+                </Link>
+              )}
             </div>
 
             {/* User Actions */}
@@ -185,10 +220,10 @@ export default function Koleksi() {
         <div className="bg-gradient-to-r from-purple-50 to-blue-50 px-6 py-8">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              💎 Koleksi BlockRights
+              💎 Koleksi Saya
             </h1>
             <p className="text-lg text-gray-600 mb-6">
-              Jelajahi koleksi eksklusif karya digital terverifikasi. Setiap karya memiliki sertifikat keaslian yang dapat diverifikasi.
+              Koleksi karya digital yang telah Anda beli. Setiap karya memiliki sertifikat keaslian yang dapat diverifikasi.
             </p>
           </div>
         </div>
@@ -199,7 +234,7 @@ export default function Koleksi() {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Cari koleksi, karya, atau seniman..."
+                placeholder="Cari koleksi yang sudah dibeli..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 bg-white placeholder-gray-500"
@@ -217,7 +252,7 @@ export default function Koleksi() {
             <div className="text-center py-12">
               <div className="text-6xl mb-4">⏳</div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Memuat koleksi...
+                Memuat koleksi Anda...
               </h3>
             </div>
           ) : (
@@ -247,11 +282,17 @@ export default function Koleksi() {
                 <div className="text-center py-12">
                   <div className="text-6xl mb-4">💎</div>
                   <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    Belum ada koleksi ditemukan
+                    Belum ada koleksi
                   </h3>
-                  <p className="text-gray-600">
-                    Coba sesuaikan kata kunci pencarian Anda
+                  <p className="text-gray-600 mb-4">
+                    Anda belum membeli karya digital apapun. Mulai jelajahi marketplace untuk menemukan karya yang menarik!
                   </p>
+                  <Link 
+                    href="/market"
+                    className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300"
+                  >
+                    🎨 Jelajahi Marketplace
+                  </Link>
                 </div>
               )}
             </>

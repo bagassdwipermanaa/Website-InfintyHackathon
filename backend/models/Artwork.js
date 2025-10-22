@@ -45,6 +45,39 @@ class Artwork {
     return artworks[0] || null;
   }
 
+  // Mencari artwork berdasarkan user ID dan artwork ID (untuk cek ownership)
+  static async findByUserIdAndArtworkId(userId, artworkId) {
+    const sql = `
+      SELECT a.*, u.name as user_name, u.email as user_email,
+             au.full_name as verified_by_name
+      FROM artworks a
+      LEFT JOIN users u ON a.user_id = u.id
+      LEFT JOIN admin_users au ON a.verified_by = au.id
+      WHERE a.user_id = ? AND a.original_artwork_id = ?
+      LIMIT 1
+    `;
+    const artworks = await query(sql, [userId, artworkId]);
+    return artworks[0] || null;
+  }
+
+  // Mencari artwork yang dibeli oleh user (artworks dengan original_artwork_id not null)
+  static async findPurchasedByUserId(userId, limit = 50, offset = 0) {
+    const sql = `
+      SELECT a.*, u.name as user_name, u.email as user_email,
+             au.full_name as verified_by_name,
+             oa.title as original_title,
+             oa.user_name as original_creator_name
+      FROM artworks a
+      LEFT JOIN users u ON a.user_id = u.id
+      LEFT JOIN admin_users au ON a.verified_by = au.id
+      LEFT JOIN artworks oa ON a.original_artwork_id = oa.id
+      WHERE a.user_id = ? AND a.original_artwork_id IS NOT NULL
+      ORDER BY a.created_at DESC
+      LIMIT ? OFFSET ?
+    `;
+    return await query(sql, [userId, limit, offset]);
+  }
+
   // Get all artworks dengan pagination
   static async findAll(limit = 50, offset = 0, status = null) {
     let sql = `

@@ -60,6 +60,15 @@ export default function Header() {
                     <span className="text-lg">💎</span>
                     <span className="font-medium">Koleksi</span>
                   </Link>
+                  {isAuthenticated && (
+                    <Link
+                      href="/upload"
+                      className="flex items-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-300 px-3 py-2 rounded-lg hover:bg-purple-50"
+                    >
+                      <span className="text-lg">📤</span>
+                      <span className="font-medium">Upload Karya</span>
+                    </Link>
+                  )}
                 </nav>
 
                 {/* Separator */}
@@ -201,6 +210,16 @@ export default function Header() {
                 <span className="text-lg">💎</span>
                 <span>Koleksi</span>
               </Link>
+              {isAuthenticated && (
+                <Link
+                  href="/upload"
+                  className="flex items-center space-x-2 text-gray-700 hover:text-purple-600 transition duration-300 font-medium px-4 py-2 rounded-xl hover:bg-gray-50"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <span className="text-lg">📤</span>
+                  <span>Upload Karya</span>
+                </Link>
+              )}
               <div className="pt-6 border-t border-gray-200">
                 {isLoading ? (
                   <div className="flex items-center space-x-3 mb-6">
