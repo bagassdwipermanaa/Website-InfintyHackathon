@@ -1,5 +1,6 @@
 const express = require("express");
 const User = require("../models/User");
+const EmailService = require("../services/EmailService");
 
 const router = express.Router();
 
@@ -488,6 +489,120 @@ router.put("/profile", async (req, res) => {
     });
   } catch (error) {
     console.error("Update profile error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan server",
+    });
+  }
+});
+
+// Route: POST /api/auth/forgot-password
+router.post("/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Validasi input
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email wajib diisi",
+      });
+    }
+
+    // Cari user berdasarkan email
+    const user = await User.findByEmail(email);
+    if (!user) {
+      // Untuk keamanan, tetap return success meskipun email tidak ditemukan
+      return res.json({
+        success: true,
+        message: "Jika email terdaftar, link reset password telah dikirim",
+      });
+    }
+
+    // Generate password reset token
+    const resetToken = await User.generatePasswordResetToken(user.id);
+
+    // Kirim email reset password
+    const emailService = new EmailService();
+    const emailResult = await emailService.sendPasswordResetEmail(
+      user.email, 
+      resetToken, 
+      user.name
+    );
+
+    if (emailResult.success) {
+      console.log(`✅ Password reset email sent to ${user.email}`);
+    } else {
+      console.error(`❌ Failed to send email to ${user.email}:`, emailResult.error);
+      // Tetap return success untuk keamanan
+    }
+
+    // Clean expired tokens
+    await User.cleanExpiredPasswordResetTokens();
+
+    res.json({
+      success: true,
+      message: "Jika email terdaftar, link reset password telah dikirim",
+    });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan server",
+    });
+  }
+});
+
+// Route: POST /api/auth/reset-password
+router.post("/reset-password", async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    // Validasi input
+    if (!token || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Token dan password baru wajib diisi",
+      });
+    }
+
+    // Validasi password
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password minimal 6 karakter",
+      });
+    }
+
+    // Cari token reset password
+    const resetTokenData = await User.findPasswordResetToken(token);
+    if (!resetTokenData) {
+      return res.status(400).json({
+        success: false,
+        message: "Token tidak valid atau sudah expired",
+      });
+    }
+
+    // Update password
+    const passwordUpdated = await User.updatePassword(resetTokenData.user_id, newPassword);
+    if (!passwordUpdated) {
+      return res.status(500).json({
+        success: false,
+        message: "Gagal mengupdate password",
+      });
+    }
+
+    // Mark token as used
+    await User.markPasswordResetTokenAsUsed(token);
+
+    console.log(`✅ Password reset successful for user: ${resetTokenData.email} (ID: ${resetTokenData.user_id})`);
+
+    res.json({
+      success: true,
+      message: "Password berhasil direset",
+    });
+  } catch (error) {
+    console.error("Reset password error:", error);
     res.status(500).json({
       success: false,
       message: "Terjadi kesalahan server",

@@ -190,6 +190,50 @@ class User {
     return result.affectedRows > 0;
   }
 
+  // Generate password reset token
+  static async generatePasswordResetToken(userId) {
+    const crypto = require('crypto');
+    const token = crypto.randomBytes(32).toString('hex');
+    
+    // Set expiration time to 1 hour from now
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 1);
+    
+    const sql = `
+      INSERT INTO password_reset_tokens (user_id, token, expires_at)
+      VALUES (?, ?, ?)
+    `;
+    
+    await query(sql, [userId, token, expiresAt]);
+    return token;
+  }
+
+  // Find password reset token
+  static async findPasswordResetToken(token) {
+    const sql = `
+      SELECT prt.*, u.email, u.name
+      FROM password_reset_tokens prt
+      JOIN users u ON prt.user_id = u.id
+      WHERE prt.token = ? AND prt.expires_at > NOW() AND prt.used = 0
+    `;
+    const result = await query(sql, [token]);
+    return result[0] || null;
+  }
+
+  // Mark password reset token as used
+  static async markPasswordResetTokenAsUsed(token) {
+    const sql = "UPDATE password_reset_tokens SET used = 1 WHERE token = ?";
+    const result = await query(sql, [token]);
+    return result.affectedRows > 0;
+  }
+
+  // Clean expired password reset tokens
+  static async cleanExpiredPasswordResetTokens() {
+    const sql = "DELETE FROM password_reset_tokens WHERE expires_at < NOW() OR used = 1";
+    const result = await query(sql);
+    return result.affectedRows;
+  }
+
   // Update Google ID
   static async updateGoogleId(id, googleId) {
     const sql = "UPDATE users SET google_id = ? WHERE id = ?";

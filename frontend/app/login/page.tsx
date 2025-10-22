@@ -209,12 +209,12 @@ export default function LoginPage() {
                   </label>
                 </div>
                 <div className="text-sm">
-                  <a
-                    href="#"
+                  <Link
+                    href="/forgot-password"
                     className="font-medium text-blue-600 hover:text-blue-500"
                   >
                     Lupa password?
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
